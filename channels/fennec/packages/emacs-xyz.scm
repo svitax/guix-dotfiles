@@ -16,7 +16,7 @@
   (package
    (inherit emacs-exwm)
    (name "fennec-emacs-exwm")
-   (propagated-inputs (list emacs-xelb font-iosevka-comfy))
+   (propagated-inputs (list emacs-xelb font-iosevka))
    (arguments
     `(#:emacs ,emacs
       #:phases
@@ -38,8 +38,8 @@
 					   (with-output-to-file exwm-executable
 					     (lambda _
 					       (format #t "#!~a ~@
-~a +SI:localuser:$USER ~@
-exec ~a --exit-with-session ~a \"$@\" -mm --debug-init -fn iosevka-comfy-20 ~%"
+                     ~a +SI:localuser:$USER ~@
+                     exec ~a --exit-with-session ~a \"$@\" -mm --debug-init -fn iosevka-20 ~%"
 						       (search-input-file inputs "/bin/sh")
 						       (search-input-file inputs "/bin/xhost")
 						       (search-input-file inputs "/bin/dbus-launch")
