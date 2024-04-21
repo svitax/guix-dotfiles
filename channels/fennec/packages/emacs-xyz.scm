@@ -40,9 +40,14 @@
 					       (format #t "#!~a ~@
                      ~a +SI:localuser:$USER ~@
                      exec ~a --exit-with-session ~a \"$@\" -mm --debug-init -fn iosevka-20 ~%"
-						       (search-input-file inputs "/bin/sh")
-						       (search-input-file inputs "/bin/xhost")
-						       (search-input-file inputs "/bin/dbus-launch")
-						       (search-input-file inputs "/bin/emacs"))))
+						       (string-append (assoc-ref inputs "bash") "/bin/sh")
+						       (string-append (assoc-ref inputs "xhost") "/bin/xhost")
+						       (string-append (assoc-ref inputs "dbus") "/bin/dbus-launch")
+						       (string-append (assoc-ref inputs "emacs") "/bin/emacs")
+						       ;; (search-input-file inputs "/bin/sh")
+						       ;; (search-input-file inputs "/bin/xhost")
+						       ;; (search-input-file inputs "/bin/dbus-launch")
+						       ;; (search-input-file inputs "/bin/emacs")
+						       )))
 					   (chmod exwm-executable #o555)
 					   #t))))))))
