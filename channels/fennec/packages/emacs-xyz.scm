@@ -10,7 +10,7 @@
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages texinfo)
-  #:use-module ((guix license) #:prefix license:))
+  #:use-module ((guix licenses) #:prefix license:))
 
 (define-public fennec-emacs-exwm
   (package
