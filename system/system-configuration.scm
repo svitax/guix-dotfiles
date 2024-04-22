@@ -32,7 +32,7 @@
   ;; for packages and 'guix install PACKAGE' to install a package.
   (packages (append (list (specification->package "emacs")
                           (specification->package "emacs-exwm")
-			  ;; (specification->package "fennec-emacs-exwm")
+			  (specification->package "fennec-emacs-exwm")
                           (specification->package "emacs-desktop-environment")
 			  (specification->package "emacs-vertico")
                           ;; (specification->package "nss-certs")
