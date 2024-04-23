@@ -39,10 +39,12 @@
 					     (lambda _
 					       (format #t "#!~a ~@
                      ~a +SI:localuser:$USER ~@
-                     exec ~a --exit-with-session ~a \"$@\" -mm --debug-init ~%"
+                     ~a --daemon -mm --debug-init
+                     exec ~a --exit-with-session ~a \"$@\" -c ~%"
 						       (search-input-file inputs "/bin/sh")
 						       (search-input-file inputs "/bin/xhost")
+						       (search-input-file inputs "/bin/emacs")
 						       (search-input-file inputs "/bin/dbus-launch")
-						       (search-input-file inputs "/bin/emacs"))))
+						       (search-input-file inputs "/bin/emacsclient"))))
 					   (chmod exwm-executable #o555)
 					   #t))))))))

@@ -1,4 +1,4 @@
-(server-start)
+;; (server-start)
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -25,11 +25,11 @@
   "Generic IPC hook function for communicating with Polybar"
   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
 
-(defun my/send-polybar-exwm-ws-indicator ()
-  "Wraps the hook for the `exwm-ws-indicator' Polybar module"
-  (my/send-polybar-hook "exwm-ws-indicator" 1))
+(defun my/send-polybar-exwm ()
+  "Wraps the hook for the `exwm' Polybar module"
+  (my/send-polybar-hook "exwm" 1))
 
-(defun my/polybar-exwm-ws-indicator ()
+(defun my/polybar-exwm ()
   "Switch case to select the appropriate indicator"
   (pcase exwm-workspace-current-index
     (0 "0")
@@ -86,11 +86,11 @@
   ;; When EXWM starts up, do some extra configuration
   (add-hook 'exwm-init-hook #'my/exwm-init-hook)
   ;; Update panel indicator when workspace changes
-  (add-hook 'exwm-workspace-switch-hook #'my/send-polybar-exwm-ws-indicator)
+  (add-hook 'exwm-workspace-switch-hook #'my/send-polybar-exwm)
   ;; Set the screen resolution (update this to be the correct resolution for your screen)
-  ;; (require 'exwm-randr)
-  ;; (exwm-randr-enable)
-  ;; (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
   ;; Set the wallpaper after changing the resolution
   (my/set-wallpaper)
   ;; Set starting workspace to 1

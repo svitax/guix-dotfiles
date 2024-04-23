@@ -22,7 +22,8 @@
 					   "font-nerd-fonts-iosevka-term"
 					   "polybar"
 					   "surf"
-					   "qutebrowser")))
+					   ;; "qutebrowser"
+					   )))
 
   ;; Below is the list of Home services.  To search for available
   ;; services, run 'guix home search KEYWORD' in a terminal.
