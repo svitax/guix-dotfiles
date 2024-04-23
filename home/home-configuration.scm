@@ -15,7 +15,14 @@
   ;; Below is the list of packages that will show up in your
   ;; Home profile, under ~/.guix-home/profile.
  (packages (specifications->packages (list "git"
-					   "surf")))
+					   "make"
+					   "feh"
+					   "xrandr"
+					   "font-iosevka-comfy"
+					   "font-nerd-fonts-iosevka-term"
+					   "polybar"
+					   "surf"
+					   "qutebrowser")))
 
   ;; Below is the list of Home services.  To search for available
   ;; services, run 'guix home search KEYWORD' in a terminal.
@@ -32,4 +39,9 @@
                                         "bash_profile")))))
 	 (simple-service 'dot-configs-service home-files-service-type
 			 `((".config/emacs/init.el"
-			    ,(local-file "files/emacs/init.el")))))))
+			    ,(local-file "files/emacs/init.el"))
+			   (".config/polybar"
+			    ,(local-file "files/polybar" #:recursive? #t))
+			   ;; (".config/polybar/config.ini"
+			   ;;  ,(local-file "files/polybar/config.ini"))
+			   )))))
