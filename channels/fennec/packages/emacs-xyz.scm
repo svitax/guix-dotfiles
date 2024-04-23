@@ -39,8 +39,8 @@
 					     (lambda _
 					       (format #t "#!~a ~@
                      ~a +SI:localuser:$USER ~@
-                     ~a --daemon -f exwm-enable
-                     exec ~a --exit-with-session ~a \"$@\" -c -a "" ~%"
+                     ~a --daemon -mm --debug-init
+                     exec ~a --exit-with-session ~a \"$@\" -c ~%"
 						       (search-input-file inputs "/bin/sh")
 						       (search-input-file inputs "/bin/xhost")
 						       (search-input-file inputs "/bin/emacs")

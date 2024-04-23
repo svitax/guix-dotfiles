@@ -47,7 +47,7 @@
   ;; services, run 'guix system search KEYWORD' in a terminal.
   (services
    (append (list
-	    (service spice-vdagent-service-type)
+	    ;; (service spice-vdagent-service-type)
                  ;; To configure OpenSSH, pass an 'openssh-configuration'
                  ;; record as a second argument to 'service' below.
                  (service openssh-service-type)

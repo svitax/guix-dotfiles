@@ -19,13 +19,13 @@
 					   "make"
 					   "feh"
 					   "xrandr"
+					   ;; "alsa-utils"
 					   "font-iosevka-comfy"
 					   "font-nerd-fonts-iosevka-term"
 					   "polybar"
 					   "surf"
 					   ;; "qutebrowser"
 					   "icecat"
-					   "openssh"
 					   )))
 
   ;; Below is the list of Home services.  To search for available

@@ -2,57 +2,6 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 
-(defvar my/polybar-processes nil
-  "A list of running Polybar processes. So that we can kill them later.")
-
-(defun my/get-monitors-list ()
-  "Get a list of the currently connected monitors.
-
-Requires Polybar, instead of relying on xrandr. Though you probably
-want it installed too."
-  (split-string
-   (substring (shell-command-to-string "polybar -m | cut -d: -f 1") 0 -1) "\n"))
-
-(defun my/kill-panel ()
-  "Stop any running Polybar processes."
-  (interactive)
-  (let ((process-list my/polybar-processes))
-    (dolist (p process-list)
-      (kill-process p)))
-  (setq my/polybar-processes nil))
-
-(defvar my/polybar-config-location "~/.config/polybar/config.ini"
-  "The customized location of your Polybar config.ini. You'll most likely
-want to customize this value.")
-
-(defun my/start-panel ()
-  "Start Polybar on each connected monitor."
-  (interactive)
-  (my/kill-panel)
-  (setq my/polybar-processes
-	(mapcar (lambda (monitor)
-		  (start-process-shell-command "polybar" nil
-					       (format "MONITOR=%s polybar -c %s --reload main" monitor my/polybar-config-location)))
-		(my/get-monitors-list))))
-
-(defun my/send-polybar-hook (module-name hook-index)
-  "Generic IPC hook function for communicating with Polybar"
-  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
-
-(defun my/send-polybar-exwm ()
-  "Wraps the hook for the `exwm' Polybar module"
-  (my/send-polybar-hook "exwm" 1))
-
-(defun my/polybar-exwm ()
-  "Switch case to select the appropriate indicator"
-  (pcase exwm-workspace-current-index
-    (0 "0")
-    (1 "1")
-    (2 "2")
-    (3 "3")
-    (4 "4")
-    (5 "5")))
-
 (defun my/set-wallpaper ()
   (interactive)
   (start-process-shell-command
@@ -63,15 +12,13 @@ want to customize this value.")
     (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
 (defun my/exwm-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 1)
   ;; Start the Polybar panel
   ;; (my/start-panel)
   ;; Launch apps that will run in the background
   ;; (my/run-in-background "polybar")
   )
-
-(defun my/exwm-frame-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1))
 
 (defun my/exwm-update-class ()
   (exwm-workspace-rename-buffer exwm-class-name))
@@ -101,14 +48,12 @@ want to customize this value.")
   (add-hook 'exwm-manage-finish-hook #'my/exwm-configure-window-by-class)
   ;; When EXWM starts up, do some extra configuration
   (add-hook 'exwm-init-hook #'my/exwm-init-hook)
-  ;; When new frame is created, set to workspace 1
-  ;; (add-hook 'after-make-frame-functions #'my/exwm-frame-init-hook)
   ;; Update panel indicator when workspace changes
   (add-hook 'exwm-workspace-switch-hook #'my/send-polybar-exwm)
   ;; Set the screen resolution (update this to be the correct resolution for your screen)
-  (require 'exwm-randr)
-  (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
+  ;; (require 'exwm-randr)
+  ;; (exwm-randr-enable)
+  ;; (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
   ;; Set the wallpaper after changing the resolution
   (my/set-wallpaper)
   ;; Set starting workspace to 1
@@ -160,5 +105,22 @@ want to customize this value.")
   (define-key desktop-environment-mode-map (kbd "s-l") nil)
   (desktop-environment-mode))
 
+;; (use-package exlybar
+;;   :config
+;;   (require 'exlybar-tray)
+;;   (require 'exlybar-date)
+;;   (require 'exlybar-wifi)
+;;   (require 'exlybar-backlight)
+;;   (require 'exlybar-volume)
+;;   (require 'exlybar-battery)
+;;   (setq my/exly-tray (exlybar-tray-create)
+;; 	my/exly-date (exlybar-date-create)
+;; 	my/exly-wifi (exlybar-wifi-create)
+;; 	my/exly-volume (exlybar-volume-create)
+;; 	my/exly-backlight (exlybar-backlight-create)
+;; 	my/exly-battery (exlybar-battery-create))
+;;   (setq exlybar-modules (list :left my/exly-tray my/exly-date
+;; 			      :right my/exly-volume my/exly-backlight)))
+  
 (use-package vertico
   :init (vertico-mode))
