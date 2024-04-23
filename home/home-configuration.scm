@@ -38,7 +38,12 @@
                    (bash-profile (list (local-file
                                         "/home/svitax/guix-dotfiles/home/files/bash/.bash_profile"
                                         "bash_profile")))))
-	 (simple-service 'dot-configs-service home-files-service-type
+	 (simple-service 'some-useful-env-vars-service
+			 home-environment-variables-service-type
+			 `(("EDITOR" . "emacsclient -r")
+			   ("ALTERNATE_EDITOR" . "emacsclient -r")))
+	 (simple-service 'dot-configs-service
+			 home-files-service-type
 			 `((".config/emacs/init.el"
 			    ,(local-file "files/emacs/init.el"))
 			   (".config/polybar"
