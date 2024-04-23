@@ -38,6 +38,7 @@
 			  (specification->package "emacs-geiser")
 			  (specification->package "emacs-geiser-guile")
 			  (specification->package "guile")
+			  (specification->package "emacs-exlybar")
                           ;; (specification->package "nss-certs")
 			  )
                     %base-packages))

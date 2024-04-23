@@ -64,7 +64,7 @@ want to customize this value.")
 
 (defun my/exwm-init-hook ()
   ;; Start the Polybar panel
-  (my/start-panel)
+  ;; (my/start-panel)
   ;; Launch apps that will run in the background
   ;; (my/run-in-background "polybar")
   )
