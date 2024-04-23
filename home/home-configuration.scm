@@ -6,6 +6,7 @@
 
 (use-modules (gnu home)
 	     (gnu home services)
+	     (gnu home services ssh)
              (gnu packages)
              (gnu services)
              (guix gexp)
@@ -23,6 +24,8 @@
 					   "polybar"
 					   "surf"
 					   ;; "qutebrowser"
+					   "icecat"
+					   "openssh"
 					   )))
 
   ;; Below is the list of Home services.  To search for available
@@ -42,6 +45,8 @@
 	 ;; 		 home-environment-variables-service-type
 	 ;; 		 `(("EDITOR" . "emacsclient -r")
 	 ;; 		   ("ALTERNATE_EDITOR" . "emacsclient -r")))
+	 (service home-openssh-service-type)
+	 (service home-ssh-agent-service-type)
 	 (simple-service 'dot-configs-service
 			 home-files-service-type
 			 `((".config/emacs/init.el"

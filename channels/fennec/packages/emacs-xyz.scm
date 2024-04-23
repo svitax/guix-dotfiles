@@ -187,7 +187,7 @@ sending the code to me, so I can integrate it into this file.")
                   (commit "v0.22.4")))
             (sha256
              (base32
-              "1vyl13swx82njqlfzmaj9c4vbdpdsj4m9f8v32a9kycdhbm9x90z"))))
+	      "1pkbflisik3b99ag999ryrgw3fhzc57bryqvdhfvj2qylf0wcac7"))))
    (build-system emacs-build-system)
    (propagated-inputs (list
 		       emacs-f

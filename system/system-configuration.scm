@@ -10,7 +10,7 @@
 ;; Indicate which modules to import to access the variables
 ;; used in this configuration.
 (use-modules (gnu))
-(use-service-modules cups desktop networking ssh xorg)
+(use-service-modules cups desktop networking ssh xorg spice)
 
 (operating-system
   (locale "en_US.utf8")
@@ -47,7 +47,7 @@
   ;; services, run 'guix system search KEYWORD' in a terminal.
   (services
    (append (list
-
+	    (service spice-vdagent-service-type)
                  ;; To configure OpenSSH, pass an 'openssh-configuration'
                  ;; record as a second argument to 'service' below.
                  (service openssh-service-type)
