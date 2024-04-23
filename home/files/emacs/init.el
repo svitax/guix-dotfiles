@@ -1,25 +1,39 @@
-;; (server-start)
-
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 
-(defvar my/polybar-process nil
-  "Holds the process of the running Polybar instance, if any")
+(defvar my/polybar-processes nil
+  "A list of running Polybar processes. So that we can kill them later.")
+
+(defun my/get-monitors-list ()
+  "Get a list of the currently connected monitors.
+
+Requires Polybar, instead of relying on xrandr. Though you probably
+want it installed too."
+  (split-string
+   (substring (shell-command-to-string "polybar -m | cut -d: -f 1") 0 -1) "\n"))
 
 (defun my/kill-panel ()
-  "Stop any running Polybar processes"
+  "Stop any running Polybar processes."
   (interactive)
-  (when my/polybar-process
-    (ignore-errors
-      (kill-process my/polybar-process)))
-  (setq my/polybar-process nil))
+  (let ((process-list my/polybar-processes))
+    (dolist (p process-list)
+      (kill-process p)))
+  (setq my/polybar-processes nil))
+
+(defvar my/polybar-config-location "~/.config/polybar/config.ini"
+  "The customized location of your Polybar config.ini. You'll most likely
+want to customize this value.")
 
 (defun my/start-panel ()
-  "Start Polybar"
+  "Start Polybar on each connected monitor."
   (interactive)
   (my/kill-panel)
-  (setq my/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+  (setq my/polybar-processes
+	(mapcar (lambda (monitor)
+		  (start-process-shell-command "polybar" nil
+					       (format "MONITOR=%s polybar -c %s --reload main" monitor my/polybar-config-location)))
+		(my/get-monitors-list))))
 
 (defun my/send-polybar-hook (module-name hook-index)
   "Generic IPC hook function for communicating with Polybar"
