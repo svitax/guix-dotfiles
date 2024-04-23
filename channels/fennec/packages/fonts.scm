@@ -1,5 +1,5 @@
 (define-module (fennec packages fonts)
-  #:use-module ((guix-licenses) #:prefix license:)
+  #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix build-system font))
@@ -16,8 +16,7 @@
 	   version
 	   "/IosevkaTerm.zip"))
      (sha256
-      (base32 "1010anwp2a4w2ahmcvgkhfg1fpr82fm6fldbrridfp119z27yb2d
-"))))
+      (base32 "1010anwp2a4w2ahmcvgkhfg1fpr82fm6fldbrridfp119z27yb2d"))))
    (build-system font-build-system)
    (home-page "https://github.com/ryanoasis/nerd-fonts")
    (synopsis "The Iosevka Term font, patched with nerd-fonts")
