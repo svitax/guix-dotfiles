@@ -40,7 +40,7 @@
 					       (format #t "#!~a ~@
                      ~a +SI:localuser:$USER ~@
                      ~a --daemon -mm --debug-init -f exwm-enable
-                     exec ~a --exit-with-session ~a \"$@\" -c ~%"
+                     exec ~a --exit-with-session ~a \"$@\" -c -a "" ~%"
 						       (search-input-file inputs "/bin/sh")
 						       (search-input-file inputs "/bin/xhost")
 						       (search-input-file inputs "/bin/emacs")

@@ -63,13 +63,15 @@ want to customize this value.")
     (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
 (defun my/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
   ;; Start the Polybar panel
   (my/start-panel)
   ;; Launch apps that will run in the background
   ;; (my/run-in-background "polybar")
   )
+
+(defun my/exwm-frame-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 1))
 
 (defun my/exwm-update-class ()
   (exwm-workspace-rename-buffer exwm-class-name))
@@ -99,6 +101,8 @@ want to customize this value.")
   (add-hook 'exwm-manage-finish-hook #'my/exwm-configure-window-by-class)
   ;; When EXWM starts up, do some extra configuration
   (add-hook 'exwm-init-hook #'my/exwm-init-hook)
+  ;; When new frame is created, set to workspace 1
+  ;; (add-hook 'after-make-frame-functions #'my/exwm-frame-init-hook)
   ;; Update panel indicator when workspace changes
   (add-hook 'exwm-workspace-switch-hook #'my/send-polybar-exwm)
   ;; Set the screen resolution (update this to be the correct resolution for your screen)
