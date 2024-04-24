@@ -51,7 +51,7 @@
 
 (define-public emacs-ef-themes
   (package
-    (name "fennec-emacs-ef-themes")
+    (name "emacs-ef-themes")
     (version "1.6.0")
     (source
      (origin
