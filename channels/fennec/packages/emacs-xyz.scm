@@ -74,7 +74,7 @@ something with a bit more flair than the Modus themes.")
 
 (define-public emacs-general
   (let ((commit "826bf2b97a0fb4a34c5eb96ec2b172d682fd548f")
-        (revision "4"))
+        (revision "5"))
     (package
       (name "emacs-general")
       (version (git-version "0" revision commit))
@@ -85,7 +85,7 @@ something with a bit more flair than the Modus themes.")
                (url "https://github.com/noctuid/general.el")
                (commit commit)))
          (sha256
-          (base32 "0wn5rk3gkimdklip392mnjrmkymgrb7q9skifi03cbpjam1anzvv"))
+          (base32 "1jillsr80l4wfbcqsxh3zbgbvmbfih2wcz518mgw9p9pwg4xwvy7"))
          (file-name (git-file-name name version))))
       (build-system emacs-build-system)
       (native-inputs
