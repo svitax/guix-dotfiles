@@ -49,9 +49,9 @@
 					   (chmod exwm-executable #o555)
 					   #t))))))))
 
-(define-public emacs-ef-themes
+(define-public fennec-emacs-ef-themes
   (package
-    (name "emacs-ef-themes")
+    (name "fennec-emacs-ef-themes")
     (version "1.6.0")
     (source
      (origin
