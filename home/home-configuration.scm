@@ -44,8 +44,8 @@
                                         "bash_profile")))))
 	 (simple-service 'some-useful-env-vars-service
 			 home-environment-variables-service-type
-			 `(("EDITOR" . "emacsclient -nr")
-			   ("ALTERNATE_EDITOR" . "emacsclient -nr")))
+			 `(("EDITOR" . "emacsclient -n -r")
+			   ("ALTERNATE_EDITOR" . "emacsclient -n -r")))
 	 (service home-openssh-service-type)
 	 (service home-ssh-agent-service-type)
 	 (simple-service 'dot-configs-service

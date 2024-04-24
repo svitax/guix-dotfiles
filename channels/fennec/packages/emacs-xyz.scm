@@ -49,7 +49,7 @@
 					   (chmod exwm-executable #o555)
 					   #t))))))))
 
-(define-public fennec-emacs-ef-themes
+(define-public emacs-ef-themes
   (package
     (name "fennec-emacs-ef-themes")
     (version "1.6.0")
@@ -71,3 +71,40 @@
 whose goal is to provide colorful yet legible options for users who want
 something with a bit more flair than the Modus themes.")
     (license license:gpl3+)))
+
+(define-public emacs-general
+  (let ((commit "826bf2b97a0fb4a34c5eb96ec2b172d682fd548f")
+        (revision "4"))
+    (package
+      (name "emacs-general")
+      (version (git-version "0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/noctuid/general.el")
+               (commit commit)))
+         (sha256
+          (base32 "0wn5rk3gkimdklip392mnjrmkymgrb7q9skifi03cbpjam1anzvv"))
+         (file-name (git-file-name name version))))
+      (build-system emacs-build-system)
+      (native-inputs
+       (list emacs-buttercup emacs-evil emacs-which-key emacs-use-package))
+      (arguments
+       `(#:tests? #t
+         #:test-command '("buttercup" "-L" "test/test-general.el")))
+      (home-page "https://github.com/noctuid/general.el")
+      (synopsis "More convenient key definitions in emacs")
+      (description "@code{general.el} provides a more convenient method for
+binding keys in emacs (for both evil and non-evil users).  Like
+@code{use-package}, which provides a convenient, unified interface for
+managing packages, @code{general.el} is intended to provide a convenient,
+unified interface for key definitions.  While this package does implement some
+completely new functionality (such as the ability to make vim-style
+keybindings under non-prefix keys with an optional timeout), its primary
+purpose is to build on existing functionality to make key definition more
+clear and concise.  @code{general-define-key} is user-extensible and supports
+defining multiple keys in multiple keymaps at once, implicitly wrapping key
+strings with (@code{kbd ...}), using named prefix key sequences (like the
+leader key in vim), and much more.")
+      (license license:gpl3+))))

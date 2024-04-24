@@ -1,3 +1,12 @@
+;;; init.el -*- lexical-binding: t; -*-
+
+(eval-when-compile
+  (eval-after-load 'advice
+    `(setq ad-redefinition-action 'accept))
+  (setq use-package-enable-imenu-support t
+	use-package-minimum-reported-time 0.01)
+  (require 'use-package))
+
 (defvar user-cache-directory "~/.cache/emacs/"
   "Location where files created by Emacs are placed.")
 
@@ -21,6 +30,82 @@
 
 (defalias 'etc #'expand-etc-file-name)
 (defalias 'var #'expand-var-file-name)
+
+(use-package general
+  :init
+  (general-evil-setup)
+  ;; Create SPC leader key, to be used in the macro.
+  (general-create-definer global-definer
+    :keymaps 'override
+    :states '(normal hybrid motion visual operator)
+    :prefix "SPC"
+    :non-normal-prefix "C-SPC")
+  ;; Add a definer for each of the major modes
+  (general-create-definer major-mode-definer
+    :keymaps 'override
+    :states '(normal hybrid motion visual operator)
+    :prefix ","
+    "" '(:ignore t :which-key "localleader"))
+  ;; Add an additional minor mode definer, for each of the modes.
+  ;; It is key to remember that in this case, the :keymaps option refers to the
+  ;; minor mode, not the keymap.
+  (general-create-definer minor-mode-definer
+    :keymaps 'override
+    :definer 'minor-mode
+    :states '(normal hybrid motion visual operator)
+    :prefix ",")
+  ;; Macro to define all key-pockets. It adapts to the name passed, and defines additonal macros to be
+  ;; used to define keybindings. See `general-global-buffer' below.
+  (defmacro +general-global-menu! (name infix-key &rest body)
+    "Create a definer named +general-global-NAME wrapping global-definer.
+      Create prefix map: +general-global-NAME. Prefix bindings in BODY with INFIX-KEY."
+    (declare (indent 2))
+    `(progn
+       (general-create-definer ,(intern (concat "+general-global-" name))
+	 :wrapping global-definer
+	 :prefix-map (quote ,(intern (concat "+general-global-" name "-map")))
+	 :infix ,infix-key
+	 :wk-full-keys nil
+	 "" '(:ignore t :which-key ,name))
+       (,(intern (concat "+general-global-" name))
+	,@body)))
+  :config
+  (+general-global-menu! "goto" "g")
+  (+general-global-menu! "notes" "n")
+  (+general-global-menu! "search" "s")
+  (+general-global-menu! "term" "t")
+  (+general-global-menu! "vc" "v")
+  (+general-global-menu! "toggle" "x"))
+
+(use-package evil
+  :general-config
+  (general-nmap
+    ;; for some reason `xref-find-definitions' and by
+    ;; consequence `evil-goto-definition' stops working randomly
+    ;; for some elisp symbols. `embark-dwim' doesn't for
+    ;; some reason?
+    ;; "gd" 'embark-dwim
+    "gd" 'xref-find-definitions
+    "C-S-t" 'xref-go-forward)
+  (general-nvmap
+    "L" 'evil-end-of-line
+    "H" 'my/back-to-indentation-or-beginning)
+  (general-omap
+    "L" 'evil-end-of-line
+    "H" 'my/back-to-indentation-or-beginning)
+  :custom
+  (evil-want-keybinding nil)
+  (evil-symbol-word-search t)
+  (evil-echo-state nil)
+  (evil-undo-system 'undo-redo)
+  (evil-want-keybinding nil)
+  (evil-want-C-u-scroll t)
+  (evil-want-C-u-delete t)
+  (evil-want-Y-yank-to-eol t)
+  (evil-respect-visual-line-mode t)
+  (evil-vsplit-window-right t)
+  (evil-split-window-below t)
+  :init (evil-mode))
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -190,6 +275,7 @@
   ;; Using the hook lets our changes persist when we use the command
   ;; `ef-themes-toggle', `ef-themes-select', and `ef-themes-load-random'.
   (add-hook 'ef-themes-post-load-hook #'my/ef-themes-custom-faces)
+  ;; TODO: use ef-dream when ef-themes v1.7 is released
   (ef-themes-select 'ef-dark))
 
 (use-package fontaine

@@ -33,6 +33,8 @@
   (packages (append (list (specification->package "emacs")
                           (specification->package "emacs-exwm")
 			  (specification->package "fennec-emacs-exwm")
+			  (specification->package "emacs-general")
+			  (specification->package "emacs-evil")
                           (specification->package "emacs-desktop-environment")
 			  (specification->package "emacs-app-launcher")
 			  (specification->package "emacs-fontaine")
