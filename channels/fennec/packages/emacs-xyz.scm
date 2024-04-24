@@ -108,3 +108,25 @@ defining multiple keys in multiple keymaps at once, implicitly wrapping key
 strings with (@code{kbd ...}), using named prefix key sequences (like the
 leader key in vim), and much more.")
       (license license:gpl3+))))
+
+(define-public emacs-expreg
+  (package
+    (name "emacs-expreg")
+    (version "1.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/casouri/expreg.el")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+	 "17jndn03fsdfnvwassxzfwr9lkb3jnw32iisrp7l9wr39spsffim"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/casouri/expreg.el")
+    (synopsis "Simple expand-region clone")
+    (description
+     "This is just like expand-region, but (1) we generate all regions at once,
+and (2) should be easier to debug, and (3) we out-source language-specific expansions to tree-sitter. Bind 'expreg-expand' and 'expreg-contract' and start using it.")
+    (license license:gpl3+)))

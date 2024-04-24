@@ -107,6 +107,93 @@
   (evil-split-window-below t)
   :init (evil-mode))
 
+(use-package anzu
+  :custom (anzu-search-threshold 10000)
+  :init (global-anzu-mode))
+
+(use-package evil-anzu
+  :after (evil anzu))
+
+(use-package modus-themes
+  :init
+  (defun my/modus-themes-custom-faces ())
+  ;; Using the hook lets our changes persist when we use the command
+  ;; `modus-themes-toggle', `modus-themes-select', and `modus-themes-load-random'.
+  (add-hook 'modus-themes-post-load-hook #'my/modus-themes-custom-faces))
+
+(use-package ef-themes
+  :init
+  (defun my/ef-themes-custom-faces ())
+  ;; Using the hook lets our changes persist when we use the command
+  ;; `ef-themes-toggle', `ef-themes-select', and `ef-themes-load-random'.
+  (add-hook 'ef-themes-post-load-hook #'my/ef-themes-custom-faces)
+  ;; TODO: use ef-dream when ef-themes v1.7 is released
+  (ef-themes-select 'ef-dark))
+
+(use-package fontaine
+  ;; :bind ("C-c f" . fontaine-set-preset)
+  :custom
+  (x-underline-at-descent-line nil)
+  (text-scale-remap-header-line t)
+  (fontaine-latest-state-file (var "fontaine-latest-state.eld"))
+  (fontaine-presets '((small
+		       :default-family "Iosevka Comfy Motion"
+		       :default-height 80
+		       :variable-pitch-family "Iosevka Comfy Duo")
+		      (regular) ; like this it uses all the fallback values and is named `regular'
+		      (medium
+		       :default-weight semilight
+		       :default-height 115
+		       :bold-weight extrabold)
+		      (large
+		       :inherit medium
+		       :default-weight regular
+		       :default-height 150)
+		      (live-stream
+		       :default-family "Iosevka Comfy Wide Motion"
+		       :default-height 150
+		       :default-weight medium
+		       :fixed-pitch-family "Iosevka Comfy Wide Motion"
+		       :variable-pitch-family "Iosevka Comfy Wide Duo"
+		       :bold-weight extrabold)
+		      (presentation
+		       :default-height 180)
+		      (t
+		       :default-family "Iosevka Comfy"
+		       :default-weight regular
+		       :default-slant normal
+		       :default-height 100
+		       :fixed-pitch-family "Iosevka Comfy"
+		       :variable-pitch-family "Iosevka Comfy Motion Duo")))
+  :config
+  ;; Set last preset of fallback to desired style from `fontaine-presets'
+  (fontaine-set-preset (or (fontaine-restore-latest-preset) 'large))
+  ;; TODO: use `fontaine-mode' when fontaine version 2.0 hits Guix upstream
+  ;; The other side of `fontaine-restore-latest-preset'
+  (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset)
+  (add-hook 'fontaine-set-preset-hook #'fontaine-store-latest-preset)
+  ;; Persist font configurations while switching themes. The
+  ;; `enable-theme-functions' is from Emacs 29.
+  (add-hook 'enable-theme-functions #'fontaine-apply-current-preset))
+
+(use-package hl-todo
+  :hook (prog-mode . hl-todo-mode)
+  :custom (hl-todo-wrap-movement t))
+
+(use-package elec-pair
+  :init (electric-pair-mode))
+
+(use-package avy
+  :general-config
+  (general-nvmap "C-s" 'avy-goto-char-timer)
+  (+general-global-goto "g" 'avy-goto-line)
+  :custom
+  (avy-timeout-seconds 0.35)
+  (avy-single-candidate-jump nil))
+
+(use-package expreg
+  :general-config (general-nvmap "RET" 'expreg-expand))
+
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
@@ -261,65 +348,3 @@
   :init (vertico-mode))
 
 (use-package app-launcher)
-
-(use-package modus-themes
-  :init
-  (defun my/modus-themes-custom-faces ())
-  ;; Using the hook lets our changes persist when we use the command
-  ;; `modus-themes-toggle', `modus-themes-select', and `modus-themes-load-random'.
-  (add-hook 'modus-themes-post-load-hook #'my/modus-themes-custom-faces))
-
-(use-package ef-themes
-  :init
-  (defun my/ef-themes-custom-faces ())
-  ;; Using the hook lets our changes persist when we use the command
-  ;; `ef-themes-toggle', `ef-themes-select', and `ef-themes-load-random'.
-  (add-hook 'ef-themes-post-load-hook #'my/ef-themes-custom-faces)
-  ;; TODO: use ef-dream when ef-themes v1.7 is released
-  (ef-themes-select 'ef-dark))
-
-(use-package fontaine
-  ;; :bind ("C-c f" . fontaine-set-preset)
-  :custom
-  (x-underline-at-descent-line nil)
-  (text-scale-remap-header-line t)
-  (fontaine-latest-state-file (var "fontaine-latest-state.eld"))
-  (fontaine-presets '((small
-		       :default-family "Iosevka Comfy Motion"
-		       :default-height 80
-		       :variable-pitch-family "Iosevka Comfy Duo")
-		      (regular) ; like this it uses all the fallback values and is named `regular'
-		      (medium
-		       :default-weight semilight
-		       :default-height 115
-		       :bold-weight extrabold)
-		      (large
-		       :inherit medium
-		       :default-weight regular
-		       :default-height 150)
-		      (live-stream
-		       :default-family "Iosevka Comfy Wide Motion"
-		       :default-height 150
-		       :default-weight medium
-		       :fixed-pitch-family "Iosevka Comfy Wide Motion"
-		       :variable-pitch-family "Iosevka Comfy Wide Duo"
-		       :bold-weight extrabold)
-		      (presentation
-		       :default-height 180)
-		      (t
-		       :default-family "Iosevka Comfy"
-		       :default-weight regular
-		       :default-slant normal
-		       :default-height 100
-		       :fixed-pitch-family "Iosevka Comfy"
-		       :variable-pitch-family "Iosevka Comfy Motion Duo")))
-  :config
-  ;; Set last preset of fallback to desired style from `fontaine-presets'
-  (fontaine-set-preset (or (fontaine-restore-latest-preset) 'large))
-  ;; TODO: use `fontaine-mode' when fontaine version 2.0 hits Guix upstream
-  ;; The other side of `fontaine-restore-latest-preset'
-  (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset)
-  (add-hook 'fontaine-set-preset-hook #'fontaine-store-latest-preset)
-  ;; Persist font configurations while switching themes. The
-  ;; `enable-theme-functions' is from Emacs 29.
-  (add-hook 'enable-theme-functions #'fontaine-apply-current-preset))
