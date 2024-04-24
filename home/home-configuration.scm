@@ -19,13 +19,14 @@
 					   "make"
 					   "feh"
 					   "xrandr"
-					   ;; "alsa-utils"
+					   "alsa-utils"
 					   "font-iosevka-comfy"
 					   "font-nerd-fonts-iosevka-term"
 					   "polybar"
 					   "surf"
 					   ;; "qutebrowser"
 					   "icecat"
+					   "st"
 					   )))
 
   ;; Below is the list of Home services.  To search for available
@@ -41,16 +42,17 @@
                    (bash-profile (list (local-file
                                         "/home/svitax/guix-dotfiles/home/files/bash/.bash_profile"
                                         "bash_profile")))))
-	 ;; (simple-service 'some-useful-env-vars-service
-	 ;; 		 home-environment-variables-service-type
-	 ;; 		 `(("EDITOR" . "emacsclient -r")
-	 ;; 		   ("ALTERNATE_EDITOR" . "emacsclient -r")))
+	 (simple-service 'some-useful-env-vars-service
+			 home-environment-variables-service-type
+			 `(("EDITOR" . "emacsclient -nr")
+			   ("ALTERNATE_EDITOR" . "emacsclient -nr")))
 	 (service home-openssh-service-type)
 	 (service home-ssh-agent-service-type)
 	 (simple-service 'dot-configs-service
 			 home-files-service-type
 			 `((".config/emacs/init.el"
 			    ,(local-file "files/emacs/init.el"))
+			   ;; TODO: create .config/cache/emacs/var and etc/ dirs to avoid errors
 			   (".config/polybar"
 			    ,(local-file "files/polybar" #:recursive? #t))
 			   ;; (".config/polybar/config.ini"
