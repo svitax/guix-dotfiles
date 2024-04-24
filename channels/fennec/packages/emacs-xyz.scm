@@ -110,23 +110,23 @@ leader key in vim), and much more.")
       (license license:gpl3+))))
 
 (define-public emacs-expreg
-  (package
-    (name "emacs-expreg")
-    (version "1.3.1")
-    (source
-     (origin
+  (let ((commit "9950c07ec90293964baa33603f4a80e764b0a847"))
+    (package
+     (name "emacs-expreg")
+     (version "1.3.1")
+     (source
+      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/casouri/expreg.el")
-             (commit version)))
+             (url "https://github.com/casouri/expreg")
+             (commit commit)))
        (file-name (git-file-name name version))
        (sha256
-        (base32
-	 "17jndn03fsdfnvwassxzfwr9lkb3jnw32iisrp7l9wr39spsffim"))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/casouri/expreg.el")
-    (synopsis "Simple expand-region clone")
-    (description
-     "This is just like expand-region, but (1) we generate all regions at once,
+        (base32 "1f9lrr6sf67ivvczdai06sj0211rjqycy2hpxy928brg38wwz33z"))))
+     (build-system emacs-build-system)
+     (home-page "https://github.com/casouri/expreg")
+     (synopsis "Simple expand-region clone")
+     (description
+      "This is just like expand-region, but (1) we generate all regions at once,
 and (2) should be easier to debug, and (3) we out-source language-specific expansions to tree-sitter. Bind 'expreg-expand' and 'expreg-contract' and start using it.")
-    (license license:gpl3+)))
+     (license license:gpl3+))))
