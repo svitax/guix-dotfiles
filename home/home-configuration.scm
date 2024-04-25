@@ -58,7 +58,6 @@
 					   "emacs-diredfl"
 					   "emacs-dired-single"
 					   "emacs-dired-imenu"
-					   "emacs-dired-sort-by"
 					   "emacs-desktop-environment"
 					   "emacs-app-launcher"
 					   "emacs-vterm"
@@ -87,10 +86,13 @@
 	 (service home-ssh-agent-service-type)
 	 (simple-service 'dot-configs-service
 			 home-files-service-type
-			 `((".config/emacs/init.el"
+			 `(;; TODO: add emacs/ directory recursively
+			   (".config/emacs/init.el"
 			    ,(local-file "files/emacs/init.el"))
 			   (".config/emacs/early-init.el"
 			    ,(local-file "files/emacs/early-init.el"))
+			   (".config/emacs/plugins/dired-sort-by.el"
+			    ,(local-file "files/emacs/plugins/dired-sort-by.el"))
 			   ;; TODO: create .config/cache/emacs/var and etc/ dirs to avoid errors
 			   (".config/polybar"
 			    ,(local-file "files/polybar" #:recursive? #t))

@@ -181,7 +181,7 @@ creating a new buffer.")
              (url "https://github.com/DamienCassou/dired-imenu.git")
              (commit "4f6169f9056fe5f9b9a97e9e75f27825a15e05b9")))
        (sha256
-        (base32 "0pdxig8kk7sf928nz4dm0bhjjlrd4miba7y2pss59kmwpwslxzjs"))))
+        (base32 "0djn4ya34l58yf9gssgm4x531qgcp1ad3wizq1nv3qyn2cjfxm7c"))))
     (build-system emacs-build-system)
     (propagated-inputs (list))
     (home-page "https://github.com/DamienCassou/dired-imenu.git")

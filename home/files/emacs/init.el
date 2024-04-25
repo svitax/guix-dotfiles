@@ -3,6 +3,9 @@
 (add-to-list 'load-path "~/.guix-home/profile/share/emacs/site-lisp")
 (guix-emacs-autoload-packages)
 
+;; "plugins/" contains downloaded packages or plugins I've written
+(add-to-list 'load-path (concat user-emacs-directory "plugins"))
+
 (eval-when-compile
   (eval-after-load 'advice
     `(setq ad-redefinition-action 'accept))
@@ -238,6 +241,9 @@
   :custom
   (avy-timeout-seconds 0.35)
   (avy-single-candidate-jump nil))
+
+(use-package xref
+  :general-config (general-nmap "M-/" 'xref-find-references))
 
 (use-package expreg
   :general-config
@@ -585,8 +591,19 @@ the unwriteable tidbits."
   :hook (vertico-mode . vertico-multiform-mode))
 
 (use-package dired
-  :general
+  :general-config
   (global-definer "e" 'dired-jump)
+  (general-nmap
+    :keymaps '(dired-mode-map)
+    "l" 'dired-find-file
+    "h" 'dired-up-directory
+    "/" 'my/dired-limit-regexp)
+  :hook
+  (dired-mode . dired-hide-details-mode)
+  (evil-collection-setup . (lambda (&rest a)
+                             (general-nmap :keymaps '(dired-mode-map)
+                               "a" 'find-file
+                               "~" #'my/dired-home-directory)))
   :custom
   (dired-dwim-target t)
   (dired-listing-switches "-AGhlvX")
@@ -596,23 +613,33 @@ the unwriteable tidbits."
   (dired-recursive-deletes 'top)
   (dired-create-destination-dirs 'ask)
   (delete-by-moving-to-trash t)
-  :hook (dired-mode . dired-hide-details-mode))
-
-(use-package dired-extras
-  :hook (evil-collection-setup . (lambda (&rest a)
-                                   (general-nmap :keymaps '(dired-mode-map)
-                                     "a" 'find-file
-                                     "~" #'my/dired-home-directory)))
   :preface
   (defun my/dired-home-directory ()
     (interactive)
     (dired-single-buffer (expand-file-name "~/")))
-  :general
-  (general-nmap
-    :keymaps '(dired-mode-map)
-    "l" 'dired-find-file
-    "h" 'dired-up-directory
-    "/" 'my/dired-limit-regexp))
+
+  (defvar my/dired--limit-hist '()
+    "Minibuffer history for `my/dired-limit-regexp'.")
+  (defun my/dired-limit-regexp (regexp omit)
+    "Limit Dired to keep files matching REGEXP.
+
+With optional OMIT argument as a prefix (\\[universal-argument]),
+exclude files matching REGEXP.
+
+Restore the buffer with \\<dired-mode-map>`\\[revert-buffer]'."
+    (interactive
+     (list
+      (read-regexp
+       (concat "Files "
+	       (when current-prefix-arg
+		 (propertize "NOT " 'face 'warning))
+	       "matching PATTERN: ")
+       nil 'my/dired--limit-hist)
+      current-prefix-arg))
+    (dired-mark-files-regexp regexp)
+    (unless omit (dired-toggle-marks))
+    (dired-do-kill-lines)
+    (add-to-history 'my/dired--limit-hist regexp))
 
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
