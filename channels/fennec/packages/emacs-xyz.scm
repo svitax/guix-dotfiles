@@ -150,3 +150,22 @@ and (2) should be easier to debug, and (3) we out-source language-specific expan
     (description
      "Provide commands `consult-todo to search, filter, jump to hl-todo keywords.")
     (license license:gpl3+)))
+
+(define-public emacs-dired-single
+  (package
+    (name "emacs-dired-single")
+    (version "20240131.1148")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://melpa.org/packages/dired-single-" version
+                           ".tar"))
+       (sha256
+        (base32 "18hnjdbs0a1ivv1yxic9l518272bb9wswhvpk7z12h2p0vw7nykh"))))
+    (build-system emacs-build-system)
+    (home-page "https://codeberg.org/amano.kenji/dired-single")
+    (synopsis "Reuse the current dired buffer")
+    (description
+     "This package reuses the current Dired buffer to visit a directory without
+creating a new buffer.")
+    (license #f)))

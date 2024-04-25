@@ -52,10 +52,16 @@
 					   "emacs-cape"
 					   "emacs-consult"
 					   "emacs-consult-dir"
+					   "emacs-embark"
+					   "emacs-marginalia"
+					   "emacs-vertico"
+					   "emacs-diredfl"
+					   "emacs-dired-single"
+					   "emacs-dired-imenu"
+					   "emacs-dired-sort-by"
 					   "emacs-desktop-environment"
 					   "emacs-app-launcher"
 					   "emacs-vterm"
-					   "emacs-vertico"
 					   "emacs-geiser"
 					   "emacs-geiser-guile"
 					   "guile")))
@@ -83,6 +89,8 @@
 			 home-files-service-type
 			 `((".config/emacs/init.el"
 			    ,(local-file "files/emacs/init.el"))
+			   (".config/emacs/early-init.el"
+			    ,(local-file "files/emacs/early-init.el"))
 			   ;; TODO: create .config/cache/emacs/var and etc/ dirs to avoid errors
 			   (".config/polybar"
 			    ,(local-file "files/polybar" #:recursive? #t))
