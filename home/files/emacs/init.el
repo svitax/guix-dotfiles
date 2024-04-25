@@ -42,7 +42,7 @@
     :keymaps 'override
     :states '(normal hybrid motion visual operator)
     :prefix "SPC"
-    :non-normal-prefix "C-SPC")
+    :non-normal-prefix "M-SPC")
   ;; Add a definer for each of the major modes
   (general-create-definer major-mode-definer
     :keymaps 'override
@@ -745,7 +745,7 @@ the unwriteable tidbits."
 	  ?\M-`
 	  ?\M-&
 	  ?\M-:
-	  ?\ ))
+	  ?\M- ))
   
   ;; Ctrl-q will enable the next key to be sent directly
   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)

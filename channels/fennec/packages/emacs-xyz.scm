@@ -169,3 +169,24 @@ and (2) should be easier to debug, and (3) we out-source language-specific expan
      "This package reuses the current Dired buffer to visit a directory without
 creating a new buffer.")
     (license #f)))
+
+(define-public emacs-dired-imenu
+  (package
+    (name "emacs-dired-imenu")
+    (version "0.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/DamienCassou/dired-imenu.git")
+             (commit "4f6169f9056fe5f9b9a97e9e75f27825a15e05b9")))
+       (sha256
+        (base32 "0pdxig8kk7sf928nz4dm0bhjjlrd4miba7y2pss59kmwpwslxzjs"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list))
+    (home-page "https://github.com/DamienCassou/dired-imenu.git")
+    (synopsis "Integrate `imenu' in `dired'.")
+    (description
+     "Emacs mode that integrates `imenu' in `dired' so you can easily jump to
+any file in the current buffer.")
+    (license #f)))
