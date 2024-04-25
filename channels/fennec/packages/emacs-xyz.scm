@@ -130,3 +130,23 @@ leader key in vim), and much more.")
       "This is just like expand-region, but (1) we generate all regions at once,
 and (2) should be easier to debug, and (3) we out-source language-specific expansions to tree-sitter. Bind 'expreg-expand' and 'expreg-contract' and start using it.")
      (license license:gpl3+))))
+
+(define-public emacs-consult-todo
+  (package
+    (name "emacs-consult-todo")
+    (version "20231022.2059")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/liuyinz/consult-todo.git")
+             (commit "84f3c9876a285f733d75053076a97cc30f7d8eb9")))
+       (sha256
+        (base32 "0v336l9dary68i910yvpk9c24b9vrc1cx615hiv9dz8zi1khz8rr"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-consult emacs-hl-todo))
+    (home-page "https://github.com/liuyinz/consult-todo")
+    (synopsis "Search hl-todo keywords in consult")
+    (description
+     "Provide commands `consult-todo to search, filter, jump to hl-todo keywords.")
+    (license license:gpl3+)))

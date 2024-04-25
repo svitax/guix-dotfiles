@@ -1,5 +1,8 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
+(add-to-list 'load-path "~/.guix-home/profile/share/emacs/site-lisp")
+(guix-emacs-autoload-packages)
+
 (eval-when-compile
   (eval-after-load 'advice
     `(setq ad-redefinition-action 'accept))
@@ -105,7 +108,18 @@
   (evil-respect-visual-line-mode t)
   (evil-vsplit-window-right t)
   (evil-split-window-below t)
+  :preface
+  (defun my/back-to-indentation-or-beginning ()
+    (interactive)
+    (if (= (point) (progn (beginning-of-line-text) (point)))
+	(beginning-of-line)))
   :init (evil-mode))
+
+(use-package evil-collection
+  :custom
+  (evil-collection-setup-minibuffer t)
+  (evil-collection-want-find-usages-bindings t)
+  :init (evil-collection-init))
 
 (use-package anzu
   :custom (anzu-search-threshold 10000)
@@ -113,6 +127,10 @@
 
 (use-package evil-anzu
   :after (evil anzu))
+
+(use-package evil-surround
+  :general-config (general-vmap "s" 'evil-surround-region)
+  :init (global-evil-surround-mode))
 
 (use-package modus-themes
   :init
@@ -130,8 +148,17 @@
   ;; TODO: use ef-dream when ef-themes v1.7 is released
   (ef-themes-select 'ef-dark))
 
+(use-package rainbow-mode
+  :hook ((prog-mode text-mode) . rainbow-mode)
+  :general-config (+general-global-toggle
+		    "c" 'rainbow-mode)
+  :custom
+  (rainbow-ansi-colors nil)
+  (rainbow-x-colors nil))
+
 (use-package fontaine
-  ;; :bind ("C-c f" . fontaine-set-preset)
+  :general-config (+general-global-toggle
+		    "f" 'fontaine-set-preset)
   :custom
   (x-underline-at-descent-line nil)
   (text-scale-remap-header-line t)
@@ -180,8 +207,29 @@
   :hook (prog-mode . hl-todo-mode)
   :custom (hl-todo-wrap-movement t))
 
+(use-package consult-todo
+  :general-config (+general-global-goto
+		    "t" 'consult-todo))
+
+(use-package crux
+  :general (general-nvmap "R" 'crux-duplicate-current-line-or-region))
+
 (use-package elec-pair
   :init (electric-pair-mode))
+
+(use-package visual-regexp
+  :general-config (global-definer "r" 'vr/query-replace))
+
+(use-package vundo
+  :general-config (global-definer "u" 'vundo)
+  :custom
+  (vundo-glyph-alist vundo-unicode-symbols)
+  (vundo-compact-display t)
+  (vundo-window-max-height 8))
+
+(use-package undo-fu-session
+  :custom (undo-fu-session-directory (var "undo-fu-session/"))
+  :init (undo-fu-session-global-mode))
 
 (use-package avy
   :general-config
@@ -192,7 +240,125 @@
   (avy-single-candidate-jump nil))
 
 (use-package expreg
-  :general-config (general-nvmap "RET" 'expreg-expand))
+  :general-config
+  (general-nvmap "RET" 'expreg-expand)
+  (general-nvmap "S-<return>" 'expreg-contract))
+
+(use-package doom-modeline
+  :config
+  (setq-default mode-line-buffer-identification "%b")
+  (setq doom-modeline-mode-alist nil)
+  (doom-modeline-def-modeline 'my-modeline
+			      '(matches buffer-info remote-host buffer-position)
+			      ;; TODO: checker segment was renamed to check in #62890ef
+			      '(misc-info time irc debug input-method major-mode process checker))
+  (add-hook 'doom-modeline-mode-hook
+	    (lambda nil
+	      (doom-modeline-set-modeline 'my-modeline 'default)))
+  (doom-modeline-mode 1)
+  (column-number-mode 1)
+  :custom
+  (doom-modeline-height 30)
+  (doom-modeline-buffer-modification-icon nil)
+  (doom-modeline-highlight-modified-buffer-name nil)
+  (doom-modeline-irc-buffers t)
+  (doom-modeline-buffer-file-name-style 'relative-from-project)
+  (doom-modeline-time-icon nil))
+
+(use-package frame
+  :custom (window-divider-default-right-width 7)
+  :config (window-divider-mode 1))
+
+(use-package time
+  :after (exwm)
+  :custom
+  (display-time-default-load-average nil)
+  (display-time-format "[%d/%b %H:%M]")
+  :config (display-time-mode))
+
+(use-package desktop-environment
+  :after (exwm)
+  :config
+  (setq desktop-environment-update-exwm-global-keys :prefix)
+  (define-key desktop-environment-mode-map (kbd "s-l") nil)
+  (desktop-environment-mode))
+
+;;; completion
+
+(use-package minibuffer
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (tab-always-indent 'complete)
+  (read-file-name-completion-ignore-case t)
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (read-buffer-completion-ignore-case t)
+  (completion-ignore-case t)
+  (enable-recursive-minibuffers t)
+  (resize-mini-windows t)
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  :init
+  (minibuffer-depth-indicate-mode)
+  (minibuffer-electric-default-mode)
+  :config
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator))
+
+(use-package savehist
+  :init (savehist-mode)
+  :custom
+  (savehist-file (var "savehist.el"))
+  (savehist-save-minibuffer-history t)
+  (savehist-autosave-interval 300)
+  (savehist-ignored-variables '(file-name-history))
+  (savehist-additional-variables '(kill-ring register-alist
+					     mark-ring global-mark-ring
+					     search-ring regexp-search-ring))
+  (history-length 1000)
+  (history-delete-duplicates t)
+  :config
+  (defun my/savehist-unpropertize-variables-h ()
+    "Remove text properties from `kill-ring' to reduce savehist cache size."
+    (setq kill-ring
+	  (mapcar #'substring-no-properties
+		  (cl-remove-if-not #'stringp kill-ring))
+	  register-alist
+	  (cl-loop for (reg . item) in register-alist
+		   if (stringp item)
+		   collect (cons reg (substring-no-properties item))
+		   else collect (cons reg item))))
+
+  (defun my/savehist-remove-unprintable-registers-h ()
+    "Remove unwriteable registers (e.g. containing window configurations).
+Otherwise, `savehist' would discard `register-alist' entirely if we don't omit
+the unwriteable tidbits."
+    ;; Save new value in the temp buffer savehist is running
+    ;; `savehist-save-hook' in. We don't want to actually remove the
+    ;; unserializable registers in the current session!
+    (setq-local register-alist
+		(cl-remove-if-not #'savehist-printable register-alist)))
+
+  (add-hook 'savehist-save-hook 'my/savehist-unpropertize-variables-h)
+  (add-hook 'savehist-save-hook 'my/savehist-remove-unprintable-registers-h))
+
+(use-package orderless
+  :config
+  (defun prefixes-for-separators (pattern _index _total)
+    (when (string-match-p "^[^][^\\+*]*[./-][^][\\+*$]*$" pattern)
+      (cons 'orderless-prefixes pattern)))
+  (cl-pushnew '(?` . orderless-regexp) orderless-affix-dispatch-alist)
+  :custom
+  (orderless-style-dispatchers
+   '(orderless-affix-dispatch prefixes-for-separators)))
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -337,13 +503,6 @@
 (exwm-randr-enable)
 (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal")  
 
-(use-package desktop-environment
-  :after exwm
-  :config
-  (setq desktop-environment-update-exwm-global-keys :prefix)
-  (define-key desktop-environment-mode-map (kbd "s-l") nil)
-  (desktop-environment-mode))
-  
 (use-package vertico
   :init (vertico-mode))
 
