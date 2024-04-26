@@ -211,3 +211,22 @@ any file in the current buffer.")
 package.  To enable this: (add-hook Info-selection-hook
 info-colors-fontify-node)")
     (license license:gpl3+)))
+
+(define-public emacs-highlight-quoted
+  (package
+    (name "emacs-highlight-quoted")
+    (version "20140916.1822")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Fanael/highlight-quoted.git")
+             (commit "24103478158cd19fbcfb4339a3f1fa1f054f1469")))
+       (sha256
+        (base32 "1gq8inxfni9zgz2brqm4nlswgr8b0spq15wr532xfrgr456g10ks"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/Fanael/highlight-quoted")
+    (synopsis "Highlight Lisp quotes and quoted symbols")
+    (description
+     "Minor mode proving highlight of Lisp quotes and quoted symbols.")
+    (license #f)))

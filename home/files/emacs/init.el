@@ -617,7 +617,7 @@ the unwriteable tidbits."
   (dired-dwim-target t)
   (dired-listing-switches "-AGhlvX")
   (dired-kill-when-opening-new-dired-buffer t)
-  (dired-auto-revert-buffer 'dired-buffer-stale-p)
+  ;; (dired-auto-revert-buffer 'dired-buffer-stale-p)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'top)
   (dired-create-destination-dirs 'ask)
@@ -788,6 +788,40 @@ nil."
 (use-package info-colors
   :commands info-colors-fontify-node
   :hook (Info-selection . info-colors-fontify-node))
+
+(use-package transient
+  :custom
+  (transient-history-file (var "transient/history.el"))
+  (transient-levels-file (etc "transient/levels.el"))
+  (transient-values-file (etc "transient/values.el")))
+
+(use-package elisp-fontification)
+
+(use-package elisp-indentation)
+
+(use-package eros
+  :general
+  (major-mode-definer emacs-lisp-mode-map
+    "b" 'eval-buffer
+    "d" 'eval-defun
+    "e" 'eval-last-sexp)
+  :hook (emacs-lisp-mode . eros-mode)
+  :init (add-hook 'eros-inspect-hooks (lambda () (flymake-mode -1))))
+
+(use-package elisp-demos
+  :ensure t
+  :init
+  (advice-add #'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
+  (advice-add #'helpful-update :after #'elisp-demos-advice-helpful-update))
+
+(use-package highlight-quoted
+  :ensure t
+  :hook (emacs-lisp-mode . highlight-quoted-mode))
+
+(use-package highlight-numbers
+  :ensure t
+  :hook ((prog-mode conf-mode) . highlight-numbers-mode)
+  :custom (highlight-numbers-generic-regexp "\\_<[[:digit:]]+\\(?:\\.[0-9]*\\)?\\_>"))
 
 (defun my/set-wallpaper ()
   (interactive)
