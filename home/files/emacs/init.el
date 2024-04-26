@@ -111,12 +111,12 @@
   (evil-respect-visual-line-mode t)
   (evil-vsplit-window-right t)
   (evil-split-window-below t)
+  :init (evil-mode)
   :preface
   (defun my/back-to-indentation-or-beginning ()
     (interactive)
     (if (= (point) (progn (beginning-of-line-text) (point)))
-	(beginning-of-line)))
-  :init (evil-mode))
+	(beginning-of-line))))
 
 (use-package evil-collection
   :custom
@@ -522,7 +522,7 @@ the unwriteable tidbits."
 
 ;; FIXME: embark alist?
 (use-package embark
-  :general
+  :general-config
   (general-nvmap
     "C-." 'embark-act
     "C-:" 'embark-act-all
@@ -538,6 +538,9 @@ the unwriteable tidbits."
     "M-." 'embark-dwim
     "C-c C-o" 'embark-collect
     "C-M-l" 'embark-export)
+  ;; TODO: use :general-config for my/embark-select
+  :bind (:map minibuffer-local-map
+	      ("C-<tab>" . my/embark-select))
   :custom
   (embark-quit-after-action nil)
   ;; Replace the key help with a completing-read interface
@@ -545,9 +548,15 @@ the unwriteable tidbits."
   (embark-indicators '(embark-minimal-indicator
                        embark-highlight-indicator
                        embark-isearch-highlight-indicator))
-  (embark-confirm-act-all nil))
-
-;; TODO: embark-extras
+  (embark-confirm-act-all nil)
+  :preface
+  (defun my/embark-select ()
+    (interactive)
+    (prog1 (embark-select)
+      (if (minibufferp)
+          (when (bound-and-true-p vertico-mode)
+            (vertico-next))
+	(call-interactively #'next-line)))))
 
 (use-package embark-consult
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
@@ -639,7 +648,7 @@ Restore the buffer with \\<dired-mode-map>`\\[revert-buffer]'."
     (dired-mark-files-regexp regexp)
     (unless omit (dired-toggle-marks))
     (dired-do-kill-lines)
-    (add-to-history 'my/dired--limit-hist regexp))
+    (add-to-history 'my/dired--limit-hist regexp)))
 
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
@@ -668,6 +677,117 @@ Restore the buffer with \\<dired-mode-map>`\\[revert-buffer]'."
   (trashed-use-header-line t)
   (trashed-sort-key '("Date deleted" . t))
   (trashed-date-format "%Y-%m-%d %H:%M:%S"))
+
+(use-package ibuffer
+  :general-config (global-definer "B" 'ibuffer-jump))
+
+(use-package ibuffer-vc
+  :hook (ibuffer . (lambda ()
+                     (ibuffer-vc-set-filter-groups-by-vc-root)
+                     (unless (eq ibuffer-sorting-mode 'alphabetic)
+                       (ibuffer-do-sort-by-alphabetic))))
+  :init
+  (setq ibuffer-formats '((mark modified read-only vc-status-mini " "
+                           (name 18 18 :left :elide)
+                           " "
+                           (size 9 -1 :right)
+                           " "
+                           (mode 16 16 :left :elide)
+                           " "
+                           (vc-status 16 16 :left)
+                           " "
+                           vc-relative-file))))
+
+(use-package window
+  :general-config
+  (general-nmap "M-o" 'other-window)
+  (global-definer
+    "c" 'my/delete-window-or-delete-frame
+    "k" 'my/kill-this-buffer
+    "w" 'evil-window-map)
+  (general-def :keymaps '(evil-window-map)
+    "C-h" nil)
+  :custom
+  (window-combination-resize t)
+  (even-window-sizes 'height-only)
+  (window-sides-vertical nil)
+  (switch-to-buffer-in-dedicated-window 'pop)
+  (split-height-threshold 80)
+  (split-width-threshold 125)
+  (window-min-height 3)
+  (window-min-width 30)
+  (indicate-buffer-boundaries t)
+  (indicate-empty-lines nil)
+  (auto-window-vscroll nil)
+  :preface
+  (defun my/delete-window-or-delete-frame (&optional window)
+    "Delete WINDOW using `delete-window'.
+If this is the sole window run `delete-frame' instead. WINDOW
+must be a valid window and defaults to the selected one. Return
+nil."
+    (interactive)
+    (condition-case nil
+	(delete-window window)
+      (error (if (and tab-bar-mode
+                      (> (length (funcall tab-bar-tabs-function)) 1))
+		 (tab-bar-cose-tab)
+               (delete-frame)))))
+
+  (defun my/kill-this-buffer (&optional arg)
+    (interactive "P")
+    (pcase arg
+      ('4 (call-interactively #'kill-buffer))
+      (_ (kill-buffer (current-buffer))))))
+
+(use-package project
+  :general-config
+  (global-definer "f" 'project-find-file)
+  ;; (general-def :keymaps 'projection-map
+  ;;   "DEL" 'my/project-remove-project)
+  :custom
+  (project-switch-commands #'project-find-file)
+  (project-list-file (file-name-concat user-cache-directory "var/projects"))
+  :config
+  (defun my/project-remove-project ()
+    "Remove project from `project--list' using completion."
+    (interactive)
+    (project--ensure-read-project-list)
+    (let* ((projects project--list)
+           (dir (completing-read "REMOVE project from list: " projects nil t)))
+      (setq project--list (delete (assoc dir projects) projects)))))
+
+(use-package help :general-config (global-definer "h" 'help-command))
+
+(use-package helpful
+  :bind
+  (([remap describe-function] . helpful-callable)
+   ([remap describe-symbol] . helpful-symbol)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-command] . helpful-command)
+   ([remap describe-key] . helpful-key)
+   :map help-map
+   ("C-." . helpful-at-point)
+   ("." . helpful-at-point)
+   ("C" . describe-command))
+  :custom (helpful-max-buffers 1))
+
+;; TODO: helpful embark
+(use-package helpful
+  :after (helpful embark)
+  :bind (:map embark-become-help-map
+              ("f" . helpful-callable)
+              ("v" . helpful-variable)
+              ("C" . helpful-command)))
+
+(use-package eldoc
+  :custom
+  (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+  (eldoc-echo-area-use-multiline-p nil)
+  (eldoc-echo-area-prefer-doc-buffer t))
+
+(use-package info-colors
+  :commands info-colors-fontify-node
+  :hook (Info-selection . info-colors-fontify-node))
 
 (defun my/set-wallpaper ()
   (interactive)

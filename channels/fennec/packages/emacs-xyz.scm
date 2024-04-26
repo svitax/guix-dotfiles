@@ -189,4 +189,25 @@ creating a new buffer.")
     (description
      "Emacs mode that integrates `imenu' in `dired' so you can easily jump to
 any file in the current buffer.")
-    (license #f)))
+    (license license:gpl3+)))
+
+(define-public emacs-info-colors
+  (package
+    (name "emacs-info-colors")
+    (version "20220927.1640")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ubolonton/info-colors.git")
+             (commit "2e237c301ba62f0e0286a27c1abe48c4c8441143")))
+       (sha256
+        (base32 "0di34jg2r8nlflxln5azaf2a409hr3pwl93x8jdkv070yqyrf69f"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/ubolonton/info-colors")
+    (synopsis "Extra colors for Info-mode")
+    (description
+     "This is a modern adaption of the extra coloring provided by Drew Adams `info+
+package.  To enable this: (add-hook Info-selection-hook
+info-colors-fontify-node)")
+    (license license:gpl3+)))
