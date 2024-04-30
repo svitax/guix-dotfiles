@@ -1,6 +1,6 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
-;;;; structure of my init.el
+;;;; package
 
 (add-to-list 'load-path "~/.guix-home/profile/share/emacs/site-lisp")
 (guix-emacs-autoload-packages)
@@ -14,6 +14,119 @@
   (setq use-package-enable-imenu-support t
 	use-package-minimum-reported-time 0.01)
   (require 'use-package))
+
+(use-package use-package-evil-bind)
+
+;;;; evil
+
+;; Use a custom keymap for leader and local-leader bindings
+(define-prefix-command 'my/leader-map)
+(define-prefix-command 'my/local-leader-map)
+
+;; TODO: add evil help-mode config to a help use-package declaration.
+(use-package evil
+  :evil-bind ((:map (evil-insert-state-map)
+		    ;; Use this instead of the default `evil-complete-next', as
+		    ;; `completion-at-point' integrates with Consult etc. by
+		    ;; default.
+		    ;; TODO: C-n and C-p in corfu-mode don't complete
+		    ;; ("C-n" . completion-at-point)
+		    ;; Emacs movement
+		    ("C-a" . my/move-indentation-or-beginning-of-line)
+		    ("C-e" . move-end-of-line)
+		    ("C-y" . yank)
+		    ("C-t" . transpose-chars))
+	      (:map (evil-visual-state-map)
+		    ("SPC" . my/leader-map)
+		    ("," . my/local-leader-map)
+		    ("H" . my/move-indentation-or-beginning-of-line)
+		    ("L" . move-end-of-line))
+	      (:map (evil-normal-state-map)
+		    ("SPC" . my/leader-map)
+		    ("," . my/local-leader-map)
+		    ("H" . my/move-indentation-or-beginning-of-line)
+		    ("L" . move-end-of-line)
+		    ("(" . evil-previous-open-paren)
+		    (")" . evil-next-close-paren)
+		    ("j" . evil-next-visual-line)
+		    ("k" . evil-previous-visual-line)
+		    ("M-j" . my/move-line-down)
+		    ("M-k" . my/move-line-up)
+		    ("M-h" . evil-shift-left-line)
+		    ("M-l" . evil-shift-right-line)
+		    ("U" . evil-redo))
+	      ;; The *Warnings* buffer loads in normal mode, and I want to be
+	      ;; able to quit it easily
+	      (:map (special-mode-map . normal)
+		    ("q" . quit-window))
+	      ;; Help bindings
+	      (:map (help-mode-map . normal)
+		    ("q" . quit-window)
+		    ("C-i" . help-go-forward)
+		    ("C-o" . help-go-back)
+		    ("<RET>" . help-follow-symbol)))
+  :custom
+  (evil-want-keybinding nil)
+  (evil-symbol-word-search t)
+  (evil-echo-state nil "Don't put insert/visual etc in minibuffer")
+  (evil-goto-definition-functions
+   '(evil-goto-definition-xref
+     evil-goto-definition-imenu
+     evil-goto-definition-semantic
+     evil-goto-definition-search)
+   "Prefer xref for jumping to definition, as this means we get the Eglot
+jump-to feature when enabled. By default this prefers imenu.")
+  (evil-undo-system 'undo-redo)
+  (evil-want-C-u-scroll t)
+  (evil-want-C-u-delete t)
+  (evil-want-Y-yank-to-eol t "Isn't working for some reason")
+  (evil-respect-visual-line-mode t)
+  (evil-vsplit-window-right t)
+  (evil-split-window-below t)
+  (evil-want-fine-undo t)
+  :preface
+  (defun my/move-indentation-or-beginning-of-line ()
+    (interactive)
+    (if (= (point) (progn (beginning-of-line-text) (point)))
+	(beginning-of-line)))
+
+  (defun my/move-line-up ()
+    "Move the current line up one row."
+    (interactive)
+    (let ((col (current-column))
+          ;; For org-agenda I like that you can temporarily change order of items, so ignore readonly
+          (inhibit-read-only (eq major-mode 'org-agenda-mode)))
+      (transpose-lines 1)
+      (forward-line -2)
+      (evil-goto-column col)))
+
+  (defun my/move-line-down ()
+    "Move the current line down one row."
+    (interactive)
+    (let ((col (current-column))
+          ;; For org-agenda I like that you can temporarily change order of items, so ignore readonly
+          (inhibit-read-only (eq major-mode 'org-agenda-mode)))
+      (forward-line 1)
+      (transpose-lines 1)
+      (forward-line -1)
+      (evil-goto-column col)))
+  :init (evil-mode)
+  :config
+  ;; I keep accidentally quitting with :q. Just deleting the window is enough.
+  (evil-ex-define-cmd "q[uit]" 'evil-window-delete)
+  ;; Use vi keys to navigate `help-mode'
+  (evil-set-initial-state 'help-mode 'normal))
+
+(use-package evil-collection
+  :custom
+  (evil-collection-setup-minibuffer t)
+  (evil-collection-want-find-usages-bindings t)
+  :init (evil-collection-init))
+
+(use-package evil-surround
+  :evil-bind ((:map (global-map . visual)
+		    ("s" . evil-surround-region)))
+  :init (global-evil-surround-mode))
 
 ;;;; files
 
@@ -130,118 +243,6 @@
 ;; TODO: rename-file-and-buffer https://github.com/karthink/.emacs.d/blob/master/lisp/better-buffers.el#L217-L231
 ;; TODO: move-buffer-file https://github.com/karthink/.emacs.d/blob/master/lisp/better-buffers.el#L234-L248
 
-;;;; evil
-
-(use-package use-package-evil-bind)
-
-;; Use a custom keymap for leader and local-leader bindings
-(define-prefix-command 'my/leader-map)
-(define-prefix-command 'my/local-leader-map)
-
-;; TODO: add evil help-mode config to a help use-package declaration.
-(use-package evil
-  :evil-bind ((:map (evil-insert-state-map)
-		    ;; Use this instead of the default `evil-complete-next', as
-		    ;; `completion-at-point' integrates with Consult etc. by
-		    ;; default.
-		    ;; TODO: C-n and C-p in corfu-mode don't complete
-		    ;; ("C-n" . completion-at-point)
-		    ;; Emacs movement
-		    ("C-a" . my/move-indentation-or-beginning-of-line)
-		    ("C-e" . move-end-of-line)
-		    ("C-y" . yank)
-		    ("C-t" . transpose-chars))
-	      (:map (evil-visual-state-map)
-		    ("SPC" . my/leader-map)
-		    ("," . my/local-leader-map)
-		    ("H" . my/move-indentation-or-beginning-of-line)
-		    ("L" . move-end-of-line))
-	      (:map (evil-normal-state-map)
-		    ("SPC" . my/leader-map)
-		    ("," . my/local-leader-map)
-		    ("H" . my/move-indentation-or-beginning-of-line)
-		    ("L" . move-end-of-line)
-		    ("(" . evil-previous-open-paren)
-		    (")" . evil-next-close-paren)
-		    ("j" . evil-next-visual-line)
-		    ("k" . evil-previous-visual-line)
-		    ("M-j" . my/move-line-down)
-		    ("M-k" . my/move-line-up)
-		    ("M-h" . evil-shift-left-line)
-		    ("M-l" . evil-shift-right-line)
-		    ("U" . evil-redo))
-	      ;; The *Warnings* buffer loads in normal mode, and I want to be
-	      ;; able to quit it easily
-	      (:map (special-mode-map . normal)
-		    ("q" . quit-window))
-	      ;; Help bindings
-	      (:map (help-mode-map . normal)
-		    ("q" . quit-window)
-		    ("C-i" . help-go-forward)
-		    ("C-o" . help-go-back)
-		    ("<RET>" . help-follow-symbol)))
-  :custom
-  (evil-want-keybinding nil)
-  (evil-symbol-word-search t)
-  (evil-echo-state nil "Don't put insert/visual etc in minibuffer")
-  (evil-goto-definition-functions
-   '(evil-goto-definition-xref
-     evil-goto-definition-imenu
-     evil-goto-definition-semantic
-     evil-goto-definition-search)
-   "Prefer xref for jumping to definition, as this means we get the Eglot
-jump-to feature when enabled. By default this prefers imenu.")
-  (evil-undo-system 'undo-redo)
-  (evil-want-C-u-scroll t)
-  (evil-want-C-u-delete t)
-  (evil-want-Y-yank-to-eol t "Isn't working for some reason")
-  (evil-respect-visual-line-mode t)
-  (evil-vsplit-window-right t)
-  (evil-split-window-below t)
-  (evil-want-fine-undo t)
-  :preface
-  (defun my/move-indentation-or-beginning-of-line ()
-    (interactive)
-    (if (= (point) (progn (beginning-of-line-text) (point)))
-	(beginning-of-line)))
-
-  (defun my/move-line-up ()
-    "Move the current line up one row."
-    (interactive)
-    (let ((col (current-column))
-          ;; For org-agenda I like that you can temporarily change order of items, so ignore readonly
-          (inhibit-read-only (eq major-mode 'org-agenda-mode)))
-      (transpose-lines 1)
-      (forward-line -2)
-      (evil-goto-column col)))
-
-  (defun my/move-line-down ()
-    "Move the current line down one row."
-    (interactive)
-    (let ((col (current-column))
-          ;; For org-agenda I like that you can temporarily change order of items, so ignore readonly
-          (inhibit-read-only (eq major-mode 'org-agenda-mode)))
-      (forward-line 1)
-      (transpose-lines 1)
-      (forward-line -1)
-      (evil-goto-column col)))
-  :init (evil-mode)
-  :config
-  ;; I keep accidentally quitting with :q. Just deleting the window is enough.
-  (evil-ex-define-cmd "q[uit]" 'evil-window-delete)
-  ;; Use vi keys to navigate `help-mode'
-  (evil-set-initial-state 'help-mode 'normal))
-
-(use-package evil-collection
-  :custom
-  (evil-collection-setup-minibuffer t)
-  (evil-collection-want-find-usages-bindings t)
-  :init (evil-collection-init))
-
-(use-package evil-surround
-  :evil-bind ((:map (global-map . visual)
-		    ("s" . evil-surround-region)))
-  :init (global-evil-surround-mode))
 
 ;;;; exwm
 
@@ -555,6 +556,15 @@ and adapted to use simulations keys to have a common yank keystroke."
   :custom (undo-fu-session-directory (var "undo-fu-session/"))
   :init (undo-fu-session-global-mode))
 
+(use-package newcomment
+  :evil-bind ((:map (global-map)
+		    ("M-;" . comment-line)
+		    ("M-RET" . comment-indent-new-line)))
+  :hook ((prog-mode . (lambda ()
+			(set (make-local-variable
+			      'comment-auto-fill-only-comments)
+			     t)))))
+
 ;;;; navigation
 
 (use-package avy
@@ -649,8 +659,8 @@ and adapted to use simulations keys to have a common yank keystroke."
   (savehist-autosave-interval 300)
   (savehist-ignored-variables '(file-name-history))
   (savehist-additional-variables '(kill-ring register-alist
-					     mark-ring global-mark-ring
-					     search-ring regexp-search-ring))
+				   mark-ring global-mark-ring
+				   search-ring regexp-search-ring))
   (history-length 1000)
   (history-delete-duplicates t)
   :config
@@ -714,7 +724,9 @@ the unwriteable tidbits."
 
 (use-package vertico-multiform
   :after vertico
-  :hook (vertico-mode . vertico-multiform-mode))
+  :hook (vertico-mode . vertico-multiform-mode)
+  :custom (vertico-multiform-commands
+	   '((Info-menu (vertico-sort-function . nil)))))
 
 (use-package corfu
   :hook
@@ -843,7 +855,7 @@ the unwriteable tidbits."
 		    ("b" . consult-project-buffer))
 	      (:map (isearch-mode-map)
 		    ("C-r" . consult-isearch-history))
-	      (:map (minibuffer-local-map)
+	      (:map (minibuffer-local-map . (normal insert emacs))
 		    ("C-r" . consult-history))
 	      (:map (consult-narrow-map)
 		    ("?" . consult-narrow-help)))
@@ -851,6 +863,14 @@ the unwriteable tidbits."
   ;; Use Consult to select xref locations with preview
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
+  (consult-async-input-throttle 0.1)
+  (consult-async-refresh-delay 0.1)
+  (consult-buffer-sources
+   '(consult--source-hidden-buffer
+     consult--source-modified-buffer
+     consult--source-buffer
+     consult--source-recent-file
+     consult--source-project-buffer))
   :init
   (defun my/consult-shell-command ()
     (interactive)
@@ -862,6 +882,7 @@ the unwriteable tidbits."
 		     candidates
 		     :prompt "Shell command: ")))
       (start-process-shell-command command nil command)))
+
   (defun my/consult-buffer-by-prefix (prefix caller show-preview)
     "Use consult to select a buffer prefixed by PREFIX#.
 
@@ -898,6 +919,8 @@ Show buffer previews if SHOW-PREVIEW is not nil."
     (interactive "P")
     (my/consult-buffer-by-prefix "D" this-command arg))
   :config
+  ;; Don't preview Icecat buffers
+  (consult-customize my/consult-buffer-icecat :preview-key nil)
   ;; Hide recent files list (still available with "f" prefix)
   (consult-customize consult--source-recent-file :hidden t)
   ;; Replace functions (consult-multi-occur is a drop-in replacement)
@@ -931,7 +954,9 @@ Show buffer previews if SHOW-PREVIEW is not nil."
 		    ("C-c C-o" . embark-collect)
 		    ("C-M-l" . embark-export))
 	      (:map (minibuffer-local-map)
-		    ("C-<tab>" . my/embark-select)))
+		    ("C-<tab>" . my/embark-select))
+	      (:map (embark-file-map)
+		    ("s" . sudo-edit-find-file)))
   :custom
   (embark-quit-after-action nil)
   ;; Replace the key help with a completing-read interface
@@ -956,7 +981,11 @@ Show buffer previews if SHOW-PREVIEW is not nil."
   :evil-bind ((:map (minibuffer-local-map)
 		    ("M-a" . marginalia-cycle)))
   :custom (marginalia-max-relative-age 0)
-  :init (marginalia-mode))
+  :init (marginalia-mode)
+  :config
+  (add-to-list 'marginalia--buffer-file :filter-return
+	       (lambda (buffer-file)
+		 (string-trim-left buffer-file "(compilation\\(<.+>\\)? run) "))))
 
 ;;;; search
 
@@ -975,6 +1004,7 @@ Show buffer previews if SHOW-PREVIEW is not nil."
 
 (use-package evil-anzu
   :after (evil anzu))
+
 ;; grep
 ;; wgrep https://github.com/mhayashi1120/Emacs-wgrep
 ;; https://github.com/karthink/.emacs.d/blob/4ab4829fde086cb665cba00ee5c6a42d167e14eb/init.el#L4039
@@ -997,13 +1027,15 @@ Show buffer previews if SHOW-PREVIEW is not nil."
   :hook
   (dired-mode . dired-hide-details-mode)
   :custom
+  (dired-listing-switches "-NGalhv --group-directories-first")
+  (dired-auto-revert-buffer t)
   (dired-dwim-target t)
-  (dired-listing-switches "-AGhlvX")
   (dired-kill-when-opening-new-dired-buffer t)
-  ;; (dired-auto-revert-buffer 'dired-buffer-stale-p)
   (dired-recursive-copies 'always)
   (dired-recursive-deletes 'top)
-  (dired-create-destination-dirs 'ask)
+  ;; (dired-create-destination-dirs 'ask)
+  ;; (dired-listing-switches "-AGhlvX")
+  ;; (dired-auto-revert-buffer 'dired-buffer-stale-p)
   (delete-by-moving-to-trash t)
   :preface
   (defun my/dired-home-directory ()
@@ -1195,9 +1227,21 @@ nil."
   ;; (general-def :keymaps 'projection-map
   ;;   "DEL" 'my/project-remove-project)
   :evil-bind ((:map (my/leader-map)
-		    ("f" . project-find-file)))
+		    ("f" . project-find-file)
+		    ("p" . project-prefix-map))
+	      (:map (project-prefix-map)
+		    ("g" . consult-ripgrep)
+		    ("s" . project-eshell)))
   :custom
-  (project-switch-commands #'project-find-file)
+  ;; (project-switch-commands #'project-find-file)
+  (project-switch-commands '((project-find-file "Find file")
+			     (consult-ripgrep "Ripgrep")
+			     (project-find-dir "Find directory")
+			     (project-eshell "Eshell")
+			     (consult-project-buffer "Buffers")
+			     (project-kill-buffers "Kill buffers")
+			     ;; (magit-project-status "Magit")
+			     ))
   (project-list-file (file-name-concat user-cache-directory "var/projects"))
   :config
   (defun my/project-remove-project ()
@@ -1240,6 +1284,8 @@ nil."
    ("C-." . helpful-at-point)
    ("." . helpful-at-point)
    ("C" . describe-command))
+  :evil-bind ((:map (embark-symbol-map)
+		    ("h" . helpful-symbol)))
   :custom (helpful-max-buffers 1))
 
 ;; TODO: helpful embark
@@ -1332,7 +1378,20 @@ nil."
 ;; edebug
 
 ;;;; term
+
 ;; vterm or eat
+(use-package vterm
+  :after (evil)
+  :evil-bind ((:map (vterm-mode-map)
+		    ("C-<SPC>" . my/leader-map)
+		    ("C-g" . vterm--self-insert))
+	      (:map (vterm-mode-map . normal)
+		    ("gk" . vterm-previous-prompt)
+		    ("gj" . vterm-next-prompt)))
+  :custom
+  (vterm-max-scrollback 10000)
+  (vterm-buffer-name-string "vterm [%s]"))
+
 ;; comint
 ;; terminal-here
 
@@ -1369,10 +1428,30 @@ nil."
 ;; nov
 
 ;;;; icons
-;; nerd-icons-completion
-;; nerd-icons-corfu
-;; nerd-icons-dired
-;; nerd-icons-ibuffer
+(use-package nerd-icons
+  :config
+  (add-all-to-list 'nerd-icons-extension-icon-alist
+		   (list '(exwm-mode
+			   nerd-icons-codicon "nf-cod-browser"
+			   :face nerd-icons-purple))))
+
+(use-package nerd-icons-completion
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(use-package nerd-icons-corfu
+  :after corfu
+  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+;; TODO: hl-line mode doesn't highlight nerd-icons in dired
+(use-package nerd-icons-dired
+  :hook (dired-mode . nerd-icons-dired-mode))
+
+;; TODO: hl-line mode doesn't highlight nerd-icons in ibuffer
+(use-package nerd-icons-ibuffer
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
 ;;;; pass
 ;; pass
@@ -1412,75 +1491,13 @@ nil."
 ELEMENTS is a list of values. For documentation on the variables APPEND and
 COMPARE-FN, see `add-to-list'."
   (let (return)
-    (dolist (elt elements returns)
+    (dolist (elt elements return)
       (setq return (add-to-list list-var elt append compare-fn)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (use-package xref
-;;   :evil-bind ((:map (global-map . normal)
-;; 		    ("M-/" . xref-find-references))))
-
-;;; completion
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(use-package vterm
-  :after (evil)
-  :evil-bind ((:map (vterm-mode-map)
-		    ("C-<SPC>" . my/leader-map)
-		    ("C-g" . vterm--self-insert))
-	      (:map (vterm-mode-map . normal)
-		    ("gk" . vterm-previous-prompt)
-		    ("gj" . vterm-next-prompt)))
-  :custom
-  (vterm-max-scrollback 10000)
-  (vterm-buffer-name-string "vterm [%s]"))
 
 ;;;;;;;;;;;;;;;;;
 
@@ -1535,4 +1552,3 @@ COMPARE-FN, see `add-to-list'."
   ;; Launch apps that will run in the background
   ;; (my/run-in-background "polybar")
   )
-  

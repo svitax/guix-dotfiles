@@ -255,3 +255,95 @@ possible: put that in .emacs (and (require centered-cursor-mode)
 (global-centered-cursor-mode +1)) to always have centered-cursor-mode on in all
 buffers.")
    (license #f)))
+
+(define-public emacs-nerd-icons-completion
+  (package
+    (name "emacs-nerd-icons-completion")
+    (version "20230430.1611")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url
+              "https://github.com/rainstormstudio/nerd-icons-completion.git")
+             (commit "c2db8557a3c1a9588d111f8c8e91cae96ee85010")))
+       (sha256
+        (base32 "10ll0dj6ym5prrkv6smj0ac2ail4b3rqcrh1lyr61y3cj422vn9z"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-nerd-icons))
+    (home-page "https://github.com/rainstormstudio/nerd-icons-completion")
+    (synopsis "Add icons to completion candidates")
+    (description
+     "Add nerd-icons to completion candidates.  nerd-icons-completion is inspired by
+`all-the-icons-completion': https://github.com/iyefrat/all-the-icons-completion")
+    (license #f)))
+
+(define-public emacs-nerd-icons-corfu
+  (package
+    (name "emacs-nerd-icons-corfu")
+    (version "20231019.1618")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/LuigiPiucco/nerd-icons-corfu.git")
+             (commit "7077bb76fefc15aed967476406a19dc5c2500b3c")))
+       (sha256
+        (base32 "13m20k242zma6jw7pkbw89fk3dnbkwdajcpiyay5xx2l9241snb7"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-nerd-icons))
+    (home-page "https://github.com/LuigiPiucco/nerd-icons-corfu")
+    (synopsis "Icons for Corfu via nerd-icons")
+    (description
+     "Introduces a margin formatter for Corfu which adds icons.  The icons are
+configurable, but should be text icons provided by the icons fonts in
+`nerd-icons'.  To use, install the package and add the following to your init:
+(add-to-list corfu-margin-formatters #'nerd-icons-corfu-formatter)")
+    (license #f)))
+
+(define-public emacs-nerd-icons-dired
+  (package
+    (name "emacs-nerd-icons-dired")
+    (version "20231214.2155")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/rainstormstudio/nerd-icons-dired.git")
+             (commit "c1c73488630cc1d19ce1677359f614122ae4c1b9")))
+       (sha256
+        (base32 "1ln73ii7c3chl4lvarwiwrdmx49q528wc0h6a7xbl68pc2pyyvq2"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-nerd-icons))
+    (home-page "https://github.com/rainstormstudio/nerd-icons-dired")
+    (synopsis "Shows icons for each file in dired mode")
+    (description
+     "To use this package, simply install and add this to your init.el (require
+nerd-icons-dired) (add-hook dired-mode-hook nerd-icons-dired-mode) or use
+use-package: (use-package nerd-icons-dired :hook (dired-mode .
+nerd-icons-dired-mode)) This package is inspired by - `all-the-icons-dired':
+https://github.com/jtbm37/all-the-icons-dired")
+    (license #f)))
+
+(define-public emacs-nerd-icons-ibuffer
+  (package
+    (name "emacs-nerd-icons-ibuffer")
+    (version "20230417.1549")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/seagle0128/nerd-icons-ibuffer.git")
+             (commit "16270e898abbba2bd810cbf97f999c6142863101")))
+       (sha256
+        (base32 "1xj1njbrzvijsmh3wb0q6p29lvkbhcfilhvzhnbagnip4x3rbhj0"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-nerd-icons))
+    (home-page "https://github.com/seagle0128/nerd-icons-ibuffer")
+    (synopsis "Display nerd icons in ibuffer")
+    (description
+     "Display nerd icons in ibuffer.  Install: From melpa, `M-x package-install RET
+nerd-icons-ibuffer RET`. (add-hook ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
+or (use-package nerd-icons-ibuffer :ensure t :hook (ibuffer-mode .
+nerd-icons-ibuffer-mode))")
+    (license #f)))
