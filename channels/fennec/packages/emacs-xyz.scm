@@ -23,79 +23,79 @@
       (modify-phases %standard-phases
 		     (add-after 'build 'install-xsession
 				(lambda* (#:key inputs outputs #:allow-other-keys)
-					 (let* ((out (assoc-ref outputs "out"))
-						(xsessions (string-append out "/share/xsessions"))
-						(bin (string-append out "/bin"))
-						(exwm-executable (string-append bin "/exwm")))
-					   ;; Add a .desktop file to xsessions
-					   (mkdir-p xsessions)
-					   (mkdir-p bin)
-					   (make-desktop-entry-file (string-append xsessions "/emacs.desktop")
-								    #:name "Lisp Machine (Emacs)"
-								    #:exec exwm-executable
-								    #:try-exec exwm-executable)
-					   ;; Add a shell wrapper to bin
-					   (with-output-to-file exwm-executable
-					     (lambda _
-					       (format #t "#!~a ~@
+				  (let* ((out (assoc-ref outputs "out"))
+					 (xsessions (string-append out "/share/xsessions"))
+					 (bin (string-append out "/bin"))
+					 (exwm-executable (string-append bin "/exwm")))
+				    ;; Add a .desktop file to xsessions
+				    (mkdir-p xsessions)
+				    (mkdir-p bin)
+				    (make-desktop-entry-file (string-append xsessions "/emacs.desktop")
+							     #:name "Lisp Machine (Emacs)"
+							     #:exec exwm-executable
+							     #:try-exec exwm-executable)
+				    ;; Add a shell wrapper to bin
+				    (with-output-to-file exwm-executable
+				      (lambda _
+					(format #t "#!~a ~@
                      ~a +SI:localuser:$USER ~@
                      ~a --daemon -mm --debug-init
                      exec ~a --exit-with-session ~a \"$@\" -c ~%"
-						       (search-input-file inputs "/bin/sh")
-						       (search-input-file inputs "/bin/xhost")
-						       (search-input-file inputs "/bin/emacs")
-						       (search-input-file inputs "/bin/dbus-launch")
-						       (search-input-file inputs "/bin/emacsclient"))))
-					   (chmod exwm-executable #o555)
-					   #t))))))))
+						(search-input-file inputs "/bin/sh")
+						(search-input-file inputs "/bin/xhost")
+						(search-input-file inputs "/bin/emacs")
+						(search-input-file inputs "/bin/dbus-launch")
+						(search-input-file inputs "/bin/emacsclient"))))
+				    (chmod exwm-executable #o555)
+				    #t))))))))
 
 (define-public emacs-ef-themes
   (package
-    (name "emacs-ef-themes")
-    (version "1.6.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/protesilaos/ef-themes")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-	 "1s3mjxyi3ssnvbz5r0j1ghnaz2qz02jmhla9nb22nzc5vzjyx5ys"))))
-    (build-system emacs-build-system)
-    (home-page "https://protesilaos.com/emacs/ef-themes")
-    (synopsis "Colorful and legible themes")
-    (description
-     "The Ef themes are a collection of light and dark themes for GNU Emacs
+   (name "emacs-ef-themes")
+   (version "1.6.0")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/protesilaos/ef-themes")
+           (commit version)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32
+       "1s3mjxyi3ssnvbz5r0j1ghnaz2qz02jmhla9nb22nzc5vzjyx5ys"))))
+   (build-system emacs-build-system)
+   (home-page "https://protesilaos.com/emacs/ef-themes")
+   (synopsis "Colorful and legible themes")
+   (description
+    "The Ef themes are a collection of light and dark themes for GNU Emacs
 whose goal is to provide colorful yet legible options for users who want
 something with a bit more flair than the Modus themes.")
-    (license license:gpl3+)))
+   (license license:gpl3+)))
 
 (define-public emacs-general
   (let ((commit "826bf2b97a0fb4a34c5eb96ec2b172d682fd548f")
         (revision "5"))
     (package
-      (name "emacs-general")
-      (version (git-version "0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/noctuid/general.el")
-               (commit commit)))
-         (sha256
-          (base32 "1jillsr80l4wfbcqsxh3zbgbvmbfih2wcz518mgw9p9pwg4xwvy7"))
-         (file-name (git-file-name name version))))
-      (build-system emacs-build-system)
-      (native-inputs
-       (list emacs-buttercup emacs-evil emacs-which-key emacs-use-package))
-      (arguments
-       `(#:tests? #t
-         #:test-command '("buttercup" "-L" "test/test-general.el")))
-      (home-page "https://github.com/noctuid/general.el")
-      (synopsis "More convenient key definitions in emacs")
-      (description "@code{general.el} provides a more convenient method for
+     (name "emacs-general")
+     (version (git-version "0" revision commit))
+     (source
+      (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/noctuid/general.el")
+             (commit commit)))
+       (sha256
+        (base32 "1jillsr80l4wfbcqsxh3zbgbvmbfih2wcz518mgw9p9pwg4xwvy7"))
+       (file-name (git-file-name name version))))
+     (build-system emacs-build-system)
+     (native-inputs
+      (list emacs-buttercup emacs-evil emacs-which-key emacs-use-package))
+     (arguments
+      `(#:tests? #t
+        #:test-command '("buttercup" "-L" "test/test-general.el")))
+     (home-page "https://github.com/noctuid/general.el")
+     (synopsis "More convenient key definitions in emacs")
+     (description "@code{general.el} provides a more convenient method for
 binding keys in emacs (for both evil and non-evil users).  Like
 @code{use-package}, which provides a convenient, unified interface for
 managing packages, @code{general.el} is intended to provide a convenient,
@@ -107,7 +107,7 @@ clear and concise.  @code{general-define-key} is user-extensible and supports
 defining multiple keys in multiple keymaps at once, implicitly wrapping key
 strings with (@code{kbd ...}), using named prefix key sequences (like the
 leader key in vim), and much more.")
-      (license license:gpl3+))))
+     (license license:gpl3+))))
 
 (define-public emacs-expreg
   (let ((commit "9950c07ec90293964baa33603f4a80e764b0a847"))
@@ -133,100 +133,125 @@ and (2) should be easier to debug, and (3) we out-source language-specific expan
 
 (define-public emacs-consult-todo
   (package
-    (name "emacs-consult-todo")
-    (version "20231022.2059")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/liuyinz/consult-todo.git")
-             (commit "84f3c9876a285f733d75053076a97cc30f7d8eb9")))
-       (sha256
-        (base32 "0v336l9dary68i910yvpk9c24b9vrc1cx615hiv9dz8zi1khz8rr"))))
-    (build-system emacs-build-system)
-    (propagated-inputs (list emacs-consult emacs-hl-todo))
-    (home-page "https://github.com/liuyinz/consult-todo")
-    (synopsis "Search hl-todo keywords in consult")
-    (description
-     "Provide commands `consult-todo to search, filter, jump to hl-todo keywords.")
-    (license license:gpl3+)))
+   (name "emacs-consult-todo")
+   (version "20231022.2059")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/liuyinz/consult-todo.git")
+           (commit "84f3c9876a285f733d75053076a97cc30f7d8eb9")))
+     (sha256
+      (base32 "0v336l9dary68i910yvpk9c24b9vrc1cx615hiv9dz8zi1khz8rr"))))
+   (build-system emacs-build-system)
+   (propagated-inputs (list emacs-consult emacs-hl-todo))
+   (home-page "https://github.com/liuyinz/consult-todo")
+   (synopsis "Search hl-todo keywords in consult")
+   (description
+    "Provide commands `consult-todo to search, filter, jump to hl-todo keywords.")
+   (license license:gpl3+)))
 
 (define-public emacs-dired-single
   (package
-    (name "emacs-dired-single")
-    (version "20240131.1148")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://melpa.org/packages/dired-single-" version
-                           ".tar"))
-       (sha256
-        (base32 "18hnjdbs0a1ivv1yxic9l518272bb9wswhvpk7z12h2p0vw7nykh"))))
-    (build-system emacs-build-system)
-    (home-page "https://codeberg.org/amano.kenji/dired-single")
-    (synopsis "Reuse the current dired buffer")
-    (description
-     "This package reuses the current Dired buffer to visit a directory without
+   (name "emacs-dired-single")
+   (version "20240131.1148")
+   (source
+    (origin
+     (method url-fetch)
+     (uri (string-append "https://melpa.org/packages/dired-single-" version
+                         ".tar"))
+     (sha256
+      (base32 "18hnjdbs0a1ivv1yxic9l518272bb9wswhvpk7z12h2p0vw7nykh"))))
+   (build-system emacs-build-system)
+   (home-page "https://codeberg.org/amano.kenji/dired-single")
+   (synopsis "Reuse the current dired buffer")
+   (description
+    "This package reuses the current Dired buffer to visit a directory without
 creating a new buffer.")
-    (license #f)))
+   (license #f)))
 
 (define-public emacs-dired-imenu
   (package
-    (name "emacs-dired-imenu")
-    (version "0.5")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/DamienCassou/dired-imenu.git")
-             (commit "4f6169f9056fe5f9b9a97e9e75f27825a15e05b9")))
-       (sha256
-        (base32 "0djn4ya34l58yf9gssgm4x531qgcp1ad3wizq1nv3qyn2cjfxm7c"))))
-    (build-system emacs-build-system)
-    (propagated-inputs (list))
-    (home-page "https://github.com/DamienCassou/dired-imenu.git")
-    (synopsis "Integrate `imenu' in `dired'.")
-    (description
-     "Emacs mode that integrates `imenu' in `dired' so you can easily jump to
+   (name "emacs-dired-imenu")
+   (version "0.5")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/DamienCassou/dired-imenu.git")
+           (commit "4f6169f9056fe5f9b9a97e9e75f27825a15e05b9")))
+     (sha256
+      (base32 "0djn4ya34l58yf9gssgm4x531qgcp1ad3wizq1nv3qyn2cjfxm7c"))))
+   (build-system emacs-build-system)
+   (propagated-inputs (list))
+   (home-page "https://github.com/DamienCassou/dired-imenu.git")
+   (synopsis "Integrate `imenu' in `dired'.")
+   (description
+    "Emacs mode that integrates `imenu' in `dired' so you can easily jump to
 any file in the current buffer.")
-    (license license:gpl3+)))
+   (license license:gpl3+)))
 
 (define-public emacs-info-colors
   (package
-    (name "emacs-info-colors")
-    (version "20220927.1640")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/ubolonton/info-colors.git")
-             (commit "2e237c301ba62f0e0286a27c1abe48c4c8441143")))
-       (sha256
-        (base32 "0di34jg2r8nlflxln5azaf2a409hr3pwl93x8jdkv070yqyrf69f"))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/ubolonton/info-colors")
-    (synopsis "Extra colors for Info-mode")
-    (description
-     "This is a modern adaption of the extra coloring provided by Drew Adams `info+
+   (name "emacs-info-colors")
+   (version "20220927.1640")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/ubolonton/info-colors.git")
+           (commit "2e237c301ba62f0e0286a27c1abe48c4c8441143")))
+     (sha256
+      (base32 "0di34jg2r8nlflxln5azaf2a409hr3pwl93x8jdkv070yqyrf69f"))))
+   (build-system emacs-build-system)
+   (home-page "https://github.com/ubolonton/info-colors")
+   (synopsis "Extra colors for Info-mode")
+   (description
+    "This is a modern adaption of the extra coloring provided by Drew Adams `info+
 package.  To enable this: (add-hook Info-selection-hook
 info-colors-fontify-node)")
-    (license license:gpl3+)))
+   (license license:gpl3+)))
 
 (define-public emacs-highlight-quoted
   (package
-    (name "emacs-highlight-quoted")
-    (version "20140916.1822")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/Fanael/highlight-quoted.git")
-             (commit "24103478158cd19fbcfb4339a3f1fa1f054f1469")))
-       (sha256
-        (base32 "1gq8inxfni9zgz2brqm4nlswgr8b0spq15wr532xfrgr456g10ks"))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/Fanael/highlight-quoted")
-    (synopsis "Highlight Lisp quotes and quoted symbols")
-    (description
-     "Minor mode proving highlight of Lisp quotes and quoted symbols.")
-    (license #f)))
+   (name "emacs-highlight-quoted")
+   (version "20140916.1822")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/Fanael/highlight-quoted.git")
+           (commit "24103478158cd19fbcfb4339a3f1fa1f054f1469")))
+     (sha256
+      (base32 "1gq8inxfni9zgz2brqm4nlswgr8b0spq15wr532xfrgr456g10ks"))))
+   (build-system emacs-build-system)
+   (home-page "https://github.com/Fanael/highlight-quoted")
+   (synopsis "Highlight Lisp quotes and quoted symbols")
+   (description
+    "Minor mode proving highlight of Lisp quotes and quoted symbols.")
+   (license #f)))
+
+(define-public emacs-centered-cursor-mode
+  (package
+   (name "emacs-centered-cursor-mode")
+   (version "20230914.1358")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/andre-r/centered-cursor-mode.el.git")
+           (commit "67ef719e685407dbc455c7430765e4e685fd95a9")))
+     (sha256
+      (base32 "1lnpwcr6289i5pqfr2cgdp4aimllfbpnhn4ljjjvfaiwi117882z"))))
+   (build-system emacs-build-system)
+   (home-page "https://github.com/andre-r/centered-cursor-mode.el")
+   (synopsis "cursor stays vertically centered")
+   (description
+    "Makes the cursor stay vertically in a defined position (usually centered).  The
+vertical position can be altered, see key definition below.  To load put that in
+.emacs: (require centered-cursor-mode) To activate do: M-x centered-cursor-mode
+for buffer local or M-x global-centered-cursor-mode for global minor mode.  Also
+possible: put that in .emacs (and (require centered-cursor-mode)
+(global-centered-cursor-mode +1)) to always have centered-cursor-mode on in all
+buffers.")
+   (license #f)))

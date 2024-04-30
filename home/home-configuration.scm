@@ -46,6 +46,7 @@
 					   "emacs-undo-fu-session"
 					   "emacs-avy"
 					   "emacs-expreg"
+					   "emacs-evil-matchit"
 					   "emacs-doom-modeline"
 					   "emacs-orderless"
 					   "emacs-corfu"
@@ -60,6 +61,7 @@
 					   "emacs-dired-imenu"
 					   "emacs-trashed"
 					   "emacs-ibuffer-vc"
+					   "emacs-centered-cursor-mode"
 					   "emacs-helpful"
 					   "emacs-info-colors"
 					   "emacs-eros"
@@ -69,6 +71,7 @@
 					   "emacs-desktop-environment"
 					   "emacs-app-launcher"
 					   "emacs-vterm"
+					   "emacs-guix"
 					   "emacs-geiser"
 					   "emacs-geiser-guile"
 					   "guile")))
@@ -101,6 +104,14 @@
 			    ,(local-file "files/emacs/early-init.el"))
 			   (".config/emacs/plugins/dired-sort-by.el"
 			    ,(local-file "files/emacs/plugins/dired-sort-by.el"))
+			   (".config/emacs/plugins/elisp-indentation.el"
+			    ,(local-file "files/emacs/plugins/elisp-indentation.el"))
+			   (".config/emacs/plugins/elisp-fontification.el"
+			    ,(local-file "files/emacs/plugins/elisp-fontification.el"))
+			   (".config/emacs/plugins/my-no-littering.el"
+			    ,(local-file "files/emacs/plugins/my-no-littering.el"))
+			   (".config/emacs/plugins/use-package-evil-bind.el"
+			    ,(local-file "files/emacs/plugins/use-package-evil-bind.el"))
 			   ;; TODO: create .config/cache/emacs/var and etc/ dirs to avoid errors
 			   (".config/polybar"
 			    ,(local-file "files/polybar" #:recursive? #t))
