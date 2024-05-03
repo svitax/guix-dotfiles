@@ -1,4 +1,7 @@
 (define-module (fennec packages fonts)
+  #:use-module (gnu packages fontutils)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages python-xyz)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
