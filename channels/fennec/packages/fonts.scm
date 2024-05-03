@@ -23,9 +23,9 @@
    (description "Nerd Fonts is a project that patches developer targeted fonts with a high number of glyphs (icons). Specifically to add a high number of extra glyphs from popular 'iconic fonts' such as Font Awesome, Devicons, Octicons, and others.")
    (license license:expat)))
 
-(define-public font-cozette
+(define-public fennec-font-cozette
   (package
-    (name "font-cozette")
+    (name "fennec-font-cozette")
     (version "1.23.2")
     (source (origin
               (method git-fetch)
