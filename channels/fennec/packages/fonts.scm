@@ -39,7 +39,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "178i812n4sfsvid7jhnm683jlxqmrv4ck6qbb4nwyllhwg3gyq60"))))
+                "1x43c3w1apxw4yva2hz14lsbh4mzsg3pfjcm25iawmsgkfn4h76x"))))
     (build-system font-build-system)
     (arguments
      `(#:phases
