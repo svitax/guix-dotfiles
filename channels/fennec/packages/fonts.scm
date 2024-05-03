@@ -22,3 +22,43 @@
    (synopsis "The Iosevka Term font, patched with nerd-fonts")
    (description "Nerd Fonts is a project that patches developer targeted fonts with a high number of glyphs (icons). Specifically to add a high number of extra glyphs from popular 'iconic fonts' such as Font Awesome, Devicons, Octicons, and others.")
    (license license:expat)))
+
+(define-public font-cozette
+  (package
+    (name "font-cozette")
+    (version "1.23.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/slavfox/Cozette")
+                     (commit (string-append "v." version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "178i812n4sfsvid7jhnm683jlxqmrv4ck6qbb4nwyllhwg3gyq60"))))
+    (build-system font-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'dont-depend-on-git
+           (lambda _
+             (substitute* "build.py"
+               ;; Merely importing this module requires a git repository.
+               ;; We don't use get_changelog, so just disable the import.
+               (("from cozette_builder\\.changeloggen import get_changelog, get_last_ver")
+                ""))))
+         (add-before 'install 'build
+           (lambda _
+             (invoke "python3" "build.py" "fonts"))))))
+    (native-inputs
+     (list fontforge
+           python
+           python-crayons
+           python-fonttools
+           python-numpy
+           python-pillow))
+    (home-page "https://github.com/slavfox/Cozette")
+    (synopsis "Bitmap programming font")
+    (description "Cozette is a 6x13px (bounding box) bitmap font based on Dina
+and heavily inspired by Creep.")
+    (license license:expat)))
