@@ -40,6 +40,19 @@
                (base32
                 "0j5pfd28s6zibgm4l3yasf5ysfq24bfxd1g4g1wdkgj7zfmqyhl8"))))
     (build-system font-build-system)
+    (arguments
+     (list #:phases #~(modify-phases %standard-phases
+			(replace 'install
+			  (lambda* (#:key outputs #:allow-other-keys)
+			    (let* ((out (assoc-ref outputs "out"))
+				   (source (getcwd))
+				   (fonts (string-append out "/share/fonts")))
+			      (for-each (cut install-file <> (string-append fonts "/truetype"))
+					(find-files source "\\.(ttf|ttc)$"))
+			      (for-each (cut install-file <> (string-append fonts "/opentype"))
+					(find-files source "\\.(otf|otc|otb)$"))
+			      (for-each (cut install-file <> (string-append fonts "/web"))
+					(find-files source "\\.(woff|woff2)$"))))))))
     (home-page "https://github.com/slavfox/Cozette")
     (synopsis "Bitmap programming font")
     (description "Cozette is a 6x13px (bounding box) bitmap font based on Dina
