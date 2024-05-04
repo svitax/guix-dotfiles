@@ -40,19 +40,36 @@
                (base32
                 "0j5pfd28s6zibgm4l3yasf5ysfq24bfxd1g4g1wdkgj7zfmqyhl8"))))
     (build-system font-build-system)
+    (outputs '("out"
+	       "bdf" "ttf"))
     (arguments
-     (list #:phases #~(modify-phases %standard-phases
-			(replace 'install
-			  (lambda* (#:key outputs #:allow-other-keys)
-			    (let* ((out (assoc-ref outputs "out"))
-				   (source (getcwd))
-				   (fonts (string-append out "/share/fonts")))
-			      (for-each (cut install-file <> (string-append fonts "/truetype"))
-					(find-files source "\\.(ttf|ttc)$"))
-			      (for-each (cut install-file <> (string-append fonts "/opentype"))
-					(find-files source "\\.(otf|otc|otb)$"))
-			      (for-each (cut install-file <> (string-append fonts "/web"))
-					(find-files source "\\.(woff|woff2)$"))))))))
+     `(#:phases (modify-phases %standard-phases
+                        (replace 'install
+                          (lambda* (#:key outputs #:allow-other-keys)
+                            (let* ((otb (assoc-ref outputs "out"))
+                                   (bdf (assoc-ref outputs "bdf"))
+                                   (ttf (assoc-ref outputs "ttf"))
+                                   (otb-font-dir (string-append (assoc-ref
+                                                                 outputs "out")
+								"/share/fonts/misc"))
+                                   (ttf-font-dir (string-append (assoc-ref
+                                                                 outputs "ttf")
+								"/share/fonts/truetype"))
+                                   (bdf-font-dir (string-append (assoc-ref
+                                                                 outputs "bdf")
+								"/share/fonts/misc")))
+                              (mkdir-p otb-font-dir)
+                              (mkdir-p bdf-font-dir)
+                              (mkdir-p ttf-font-dir)
+                              (for-each (lambda (otb)
+                                          (install-file otb otb-font-dir))
+                                        (find-files "." "\\.otb$"))
+                              (for-each (lambda (bdf)
+                                          (install-file bdf bdf-font-dir))
+                                        (find-files "." "\\.bdf$"))
+                              (for-each (lambda (ttf)
+                                          (install-file ttf ttf-font-dir))
+                                        (find-files "." "\\.ttf$"))) #t)))))
     (home-page "https://github.com/slavfox/Cozette")
     (synopsis "Bitmap programming font")
     (description "Cozette is a 6x13px (bounding box) bitmap font based on Dina
