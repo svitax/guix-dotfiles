@@ -535,7 +535,7 @@ and adapted to use simulations keys to have a common yank keystroke."
 ;;;; editing
 
 (use-package crux
-  ;; BUG: evil-visual-line is including newline? and causes `crux-duplicate-current-line-or-region' to include next line 
+  ;; BUG: evil-visual-line is including newline? and causes `crux-duplicate-current-line-or-region' to include next line
   :evil-bind ((:map (global-map . normal)
 		    ("R" . crux-duplicate-current-line-or-region))))
 
@@ -871,8 +871,7 @@ the unwriteable tidbits."
    '(consult--source-hidden-buffer
      consult--source-modified-buffer
      consult--source-buffer
-     consult--source-recent-file
-     consult--source-project-buffer))
+     consult--source-recent-file))
   :init
   (defun my/consult-shell-command ()
     (interactive)
@@ -985,7 +984,7 @@ Show buffer previews if SHOW-PREVIEW is not nil."
   :custom (marginalia-max-relative-age 0)
   :init (marginalia-mode)
   :config
-  (add-to-list 'marginalia--buffer-file :filter-return
+  (advice-add 'marginalia--buffer-file :filter-return
 	       (lambda (buffer-file)
 		 (string-trim-left buffer-file "(compilation\\(<.+>\\)? run) "))))
 
@@ -1153,7 +1152,7 @@ Restore the buffer with \\<dired-mode-map>`\\[revert-buffer]'."
   :evil-bind ((:map (global-map . normal)
 		    ("M-o" . other-window))
 	      (:map (my/leader-map)
-		    ("c" . my/delete-window-or-frame)
+		    ("c" . my/delete-window-or-delete-frame)
 		    ("k" . my/kill-this-buffer)
 		    ("w" . evil-window-map))
 	      (:map (evil-window-map)
@@ -1218,7 +1217,13 @@ nil."
 ;; uniquify
 
 ;;;; vc
-;; magit
+
+(use-package magit
+  :evil-bind ((:map (my/leader-map)
+		    ("v" . magit-status)))
+  :hook ((magit-post-clone . (lambda ()
+			       (project-remember-project (list 'vc 'Git default-directory))))))
+
 ;; diff-hl or gitgutter
 
 ;;;; project
@@ -1394,12 +1399,34 @@ nil."
   (vterm-max-scrollback 10000)
   (vterm-buffer-name-string "vterm [%s]"))
 
-;; comint
+(use-package comint
+  :evil-bind ((:map (comint-mode-map)
+		    ("M-<up>" . comint-previous-prompt)
+		    ("M-<down>" . comint-next-prompt)
+		    ("C-c l" . comint-clear-buffer)
+		    ("C-c C-o" . my/comint-kill-ring-save-outputs)))
+  :init
+  (defun my/comint-kill-ring-save-outputs ()
+    "Add to the kill ring CURRENT-PREFIX-ARG outputs, including prompts.
+If no universal argument is passed, assume only one output."
+    (interactive)
+    (save-excursion
+      (let (times)
+	(if (or (null current-prefix-arg) (< current-prefix-arg 1))
+	    (setq times 1)
+	  (setq times current-prefix-arg))
+	(comint-previous-prompt times)
+	(forward-line -1)
+	(forward-line)
+	(message (format "Comint input added to the kill ring (%d commands)" times))
+	(kill-ring-save (point) (car comint-last-prompt))))))
+
 ;; terminal-here
 
 ;;;; eshell
 ;; eshell
 ;; eshell-syntax-highlighting
+;; eshell-bookmark
 ;; fish-completion?
 ;; bash-completion?
 ;; capf-autosuggest?
@@ -1432,10 +1459,16 @@ nil."
 ;;;; icons
 (use-package nerd-icons
   :config
-  (add-all-to-list 'nerd-icons-extension-icon-alist
-		   (list '(exwm-mode
-			   nerd-icons-codicon "nf-cod-browser"
-			   :face nerd-icons-purple))))
+  (add-to-list 'nerd-icons-extension-icon-alist
+	       '("epp" nerd-icons-sucicon "nf-custom-puppet"
+		 :face nerd-icons-blue))
+  (add-to-list 'nerd-icons-extension-icon-alist
+	       '("erb" nerd-icons-sucicon "nf-custom-puppet"
+		 :face nerd-icons-orange))
+  (add-to-list 'nerd-icons-mode-icon-alist
+	       '(exwm-mode
+		 nerd-icons-codicon "nf-cod-browser"
+		 :face nerd-icons-purple)))
 
 (use-package nerd-icons-completion
   :after marginalia
