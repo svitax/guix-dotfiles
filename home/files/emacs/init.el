@@ -485,32 +485,32 @@ and adapted to use simulations keys to have a common yank keystroke."
   (text-scale-remap-header-line t)
   (fontaine-latest-state-file (var "fontaine-latest-state.eld"))
   (fontaine-presets '((small
-		       :default-family "Iosevka Comfy Motion"
-		       :default-height 80
+		       :default-family "Iosevka Comfy"
+		       :default-height 115
 		       :variable-pitch-family "Iosevka Comfy Duo")
 		      (regular) ; like this it uses all the fallback values and is named `regular'
 		      (medium
 		       :default-weight semilight
-		       :default-height 115
+		       :default-height 150
 		       :bold-weight extrabold)
 		      (large
-		       :inherit medium
+			:inherit medium
 		       :default-weight regular
-		       :default-height 150)
+		       :default-height 180)
 		      (live-stream
-		       :default-family "Iosevka Comfy Wide Motion"
-		       :default-height 150
+		       :default-family "Iosevka Comfy Wide"
+		       :default-height 180
 		       :default-weight medium
 		       :fixed-pitch-family "Iosevka Comfy Wide Motion"
 		       :variable-pitch-family "Iosevka Comfy Wide Duo"
 		       :bold-weight extrabold)
 		      (presentation
-		       :default-height 180)
+		       :default-height 200)
 		      (t
 		       :default-family "Iosevka Comfy"
 		       :default-weight regular
 		       :default-slant normal
-		       :default-height 100
+		       :default-height 115
 		       :fixed-pitch-family "Iosevka Comfy"
 		       :variable-pitch-family "Iosevka Comfy Motion Duo")))
   :config
