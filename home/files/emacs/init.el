@@ -59,6 +59,8 @@
 	      ;; able to quit it easily
 	      (:map (special-mode-map . normal)
 		    ("q" . quit-window))
+	      (:map (view-mode-map . normal)
+		    ("SPC" . my/leader-map))
 	      ;; Help bindings
 	      (:map (help-mode-map . normal)
 		    ("q" . quit-window)
